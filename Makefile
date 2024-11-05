@@ -4,11 +4,11 @@ OBJ_DIR = obj
 SRC_DIR = src
 INC_DIR = inc
 
-SRCS = ssl.c md5.c sha256.c
+SRCS = ssl.c md5.c sha256.c options.c
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) # -g
+CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -g
 LDFLAGS = -lm
 
 all: $(NAME)
