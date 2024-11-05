@@ -6,25 +6,25 @@ options_add_p(Options *const opts) {
 }
 
 void
-option_add_q(Options *const opts) {
+options_add_q(Options *const opts) {
     opts->q = true;
 }
 
 void
-option_add_r(Options *const opts) {
+options_add_r(Options *const opts) {
     opts->r = true;
 }
 
 void
-option_add_s(Options *const opts) {
+options_add_s(Options *const opts) {
     opts->s = true;
 }
 
 static const OptionEntry option_map[] = {
     {"-p", "--print",   options_add_p},
-    {"-q", "--quiet",   option_add_q },
-    {"-r", "--reverse", option_add_r },
-    {"-s", "--sum",     option_add_s },
+    {"-q", "--quiet",   options_add_q },
+    {"-r", "--reverse", options_add_r },
+    {"-s", "--sum",     options_add_s },
 };
 
 int
