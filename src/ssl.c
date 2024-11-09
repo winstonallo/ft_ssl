@@ -24,6 +24,8 @@ main(int ac, char **av) {
         return EXIT_FAILURE;
     }
 
+    
+
     algo_map[cmd](&opts);
 
     options_cleanup(opts.targets);

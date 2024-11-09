@@ -4,8 +4,15 @@
 #include <stdbool.h>
 #include <time.h>
 
+#define MALLOC_ERROR(msg)                                                                                                                                      \
+    {                                                                                                                                                          \
+        perror(msg);                                                                                                                                           \
+        return -1;                                                                                                                                             \
+    }
+
 typedef struct File {
     const char *path;
+    const char *content;
     struct File *next;
 } File;
 

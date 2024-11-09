@@ -4,7 +4,7 @@ OBJ_DIR = obj
 SRC_DIR = src
 INC_DIR = inc
 
-SRCS = ssl.c md5.c sha256.c options.c string.c
+SRCS = ssl.c md5.c sha256.c options.c string.c buf.c
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 
 CC = cc
