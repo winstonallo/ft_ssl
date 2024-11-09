@@ -81,7 +81,6 @@ options_cleanup(File *head) {
     File *prev;
 
     while (head) {
-        printf("%s\n", head->path);
         prev = head;
         head = head->next;
         free(prev);
@@ -110,7 +109,7 @@ options_parse(struct Options *const opts, char **av) {
 
             if (entry->option_s == NULL) {
                 INVALID_COMMAND(av[idx]);
-                options_cleanup(opts->to_hash);
+                options_cleanup(opts->targets);
                 return -1;
             }
 
@@ -119,11 +118,11 @@ options_parse(struct Options *const opts, char **av) {
             File *new = file_new(av[idx]);
             if (!new) {
                 MALLOC_ERROR("");
-                options_cleanup(opts->to_hash);
+                options_cleanup(opts->targets);
                 return -1;
             }
 
-            file_add_back(&opts->to_hash, new);
+            file_add_back(&opts->targets, new);
         }
     }
     return cmd;

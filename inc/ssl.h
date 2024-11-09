@@ -14,7 +14,7 @@ typedef struct Options {
     bool q;
     bool r;
     bool s;
-    File *to_hash;
+    File *targets;
 } Options;
 
 typedef enum Command {
@@ -25,8 +25,8 @@ typedef enum Command {
 
 typedef void (*OptionHandler)(struct Options *const);
 
-int md5(void *buf);
-int sha256(void *buf);
+int md5(const Options *const opts);
+int sha256(const Options *const opts);
 
 // options.c
 Command options_parse(struct Options *const args, char **argv);

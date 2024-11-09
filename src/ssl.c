@@ -1,6 +1,14 @@
 #include "ssl.h"
+#include <bits/getopt_core.h>
 #include <stdbool.h>
 #include <stdlib.h>
+
+typedef int (*Algo)(const Options *const);
+
+static const Algo algo_map[] = {
+    md5,    // CMD_MD5
+    sha256, // CMD_SHA256
+};
 
 int
 main(int ac, char **av) {
@@ -10,10 +18,13 @@ main(int ac, char **av) {
 
     struct Options opts = {0};
 
-    if (options_parse(&opts, av) == -1) {
-        options_cleanup(opts.to_hash);
+    Command cmd = options_parse(&opts, av);
+    if (cmd == CMD_INVALID) {
+        options_cleanup(opts.targets);
         return EXIT_FAILURE;
     }
 
-    options_cleanup(opts.to_hash);
+    algo_map[cmd](&opts);
+
+    options_cleanup(opts.targets);
 }
