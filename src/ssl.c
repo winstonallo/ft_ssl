@@ -1,17 +1,6 @@
 #include "ssl.h"
 #include <stdbool.h>
-
-int
-cmp(void *a, void *b) {
-    unsigned char *s = a, *t = b;
-
-    while (*s && *t && *s == *t) {
-        s++;
-        t++;
-    }
-
-    return (*(unsigned char *)s - *(unsigned char *)t);
-}
+#include <stdlib.h>
 
 int
 main(int ac, char **av) {
@@ -19,11 +8,12 @@ main(int ac, char **av) {
         return 2;
     }
 
-    if (!cmp(av[1], "md5")) {
-        return md5(av[2]);
-    } else if (!cmp(av[1], "sha256")) {
-        return sha256(av[2]);
+    struct Options opts = {0};
+
+    if (options_parse(&opts, av) == -1) {
+        options_cleanup(opts.to_hash);
+        return EXIT_FAILURE;
     }
 
-    return 1;
+    options_cleanup(opts.to_hash);
 }
