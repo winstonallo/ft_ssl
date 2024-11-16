@@ -5,7 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
+
 
 #define INVALID_COMMAND(cmd)                                                                                           \
     {                                                                                                                  \
@@ -156,12 +156,22 @@ options_parse(struct Options *const opts, char **av) {
             File *new = file_new(av[idx]);
             if (!new) {
                 options_cleanup(opts->targets);
-                MALLOC_ERROR("");
+                MALLOC_ERROR("could not allocate memory");
                 return -1;
             }
 
             file_add_back(&opts->targets, new);
         }
     }
+
+    if (opts->targets == NULL) {
+        opts->targets = file_new("stdin");
+        if (!opts->targets) {
+            options_cleanup(opts->targets);
+            MALLOC_ERROR("could not allocate memory");
+            return -1;
+        }
+    }
+
     return cmd;
 }

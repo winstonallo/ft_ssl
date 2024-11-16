@@ -2,7 +2,8 @@
 #define SSL_H
 
 #include <stdbool.h>
-#include <time.h>
+
+#define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
 
 #define MALLOC_ERROR(msg)                                                                                              \
     { perror(msg); }

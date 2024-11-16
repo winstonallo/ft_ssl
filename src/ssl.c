@@ -1,5 +1,4 @@
 #include "ssl.h"
-#include <bits/getopt_core.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -21,6 +20,11 @@ main(int ac, char **av) {
 
     Command cmd = options_parse(&opts, av);
     if (cmd == CMD_INVALID) {
+        options_cleanup(opts.targets);
+        return EXIT_FAILURE;
+    }
+
+    if (cmd != CMD_HELP && file_read_all(&opts) == -1) {
         options_cleanup(opts.targets);
         return EXIT_FAILURE;
     }
