@@ -31,20 +31,19 @@ typedef enum Command {
 typedef void (*OptionHandler)(struct Options *const);
 
 // md5.c
-int md5(const Options *const opts);
+int md5(Options *const opts);
 
 // sha256.c
-int sha256(const Options *const opts);
+int sha256(Options *const opts);
 
 // help.c
-int help(const Options *const opts);
+int help(Options *const opts);
 
 // options.c
 Command options_parse(struct Options *const args, char **argv);
 void options_cleanup(File *head);
 
-// string.c
-int cmp(void *a, void *b);
-size_t len(const char *const s);
+// file.c
+int file_read_all(Options *const opts);
 
 #endif

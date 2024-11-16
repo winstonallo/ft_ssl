@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef int (*Algo)(const Options *const);
+typedef int (*Algo)(Options *const);
 
 static const Algo algo_map[] = {
     md5,    // CMD_MD5

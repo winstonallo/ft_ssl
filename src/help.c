@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 int
-help(const Options *const opts) {
+help(Options *const opts) {
     (void)opts;
 
     write(STDERR_FILENO, "help:\n\n", 7);

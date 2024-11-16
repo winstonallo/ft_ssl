@@ -1,13 +1,16 @@
+#include "libft.h"
 #include "ssl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
+#define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
+
 #define INVALID_COMMAND(cmd)                                                                                           \
     {                                                                                                                  \
         write(STDERR_FILENO, "Invalid command '", 18);                                                                 \
-        write(STDERR_FILENO, cmd, len(cmd));                                                                           \
+        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                     \
         write(STDERR_FILENO, "'; type \"help\" for a list.\n", 28);                                                    \
     }
 
@@ -23,11 +26,11 @@
             algo_name = "sha256";                                                                                      \
         }                                                                                                              \
                                                                                                                        \
-        write(STDERR_FILENO, algo_name, len(algo_name));                                                               \
+        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                         \
         write(STDERR_FILENO, ": Unknown option or message digest: ", 36);                                              \
-        write(STDERR_FILENO, cmd, len(cmd));                                                                           \
+        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                     \
         write(STDERR_FILENO, "\n", 1);                                                                                 \
-        write(STDERR_FILENO, algo_name, len(algo_name));                                                               \
+        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                         \
         write(STDERR_FILENO, ": Use -help for summary.\n", 25);                                                        \
     }
 
@@ -99,6 +102,7 @@ options_cleanup(File *head) {
     File *prev;
 
     while (head) {
+        free(head->content);
         prev = head;
         head = head->next;
         free(prev);
@@ -107,11 +111,11 @@ options_cleanup(File *head) {
 
 Command
 options_get_command(const char *const cmd) {
-    if (!cmp("md5", (void *)cmd)) {
+    if (!ft_strncmp("md5", (void *)cmd, 4)) {
         return CMD_MD5;
-    } else if (!cmp("sha256", (void *)cmd)) {
+    } else if (!ft_strncmp("sha256", (void *)cmd, 7)) {
         return CMD_SHA256;
-    } else if (!cmp("help", (void *)cmd)) {
+    } else if (!ft_strncmp("help", (void *)cmd, 5)) {
         return CMD_HELP;
     } else {
         return CMD_INVALID;
@@ -136,7 +140,7 @@ options_parse(struct Options *const opts, char **av) {
         if (av[idx][0] == '-') {
 
             const OptionEntry *entry = option_map;
-            while (entry->s != NULL && cmp((void *)entry->s, av[idx]) && cmp((void *)entry->l, av[idx])) {
+            while (entry->s != NULL && STRCMP(entry->s, av[idx]) && STRCMP(entry->l, av[idx])) {
                 entry++;
             }
 
