@@ -8,13 +8,20 @@
     {                                                                                                                  \
         write(STDERR_FILENO, "Invalid command '", 18);                                                                 \
         write(STDERR_FILENO, cmd, len(cmd));                                                                           \
-        write(STDERR_FILENO, "'; type \"help\" for a list.\n", 28);                                                      \
-        return CMD_INVALID;                                                                                            \
+        write(STDERR_FILENO, "'; type \"help\" for a list.\n", 28);                                                    \
     }
 
 #define INVALID_OPTION(algo, cmd)                                                                                      \
     {                                                                                                                  \
-        char *algo_name = algo == CMD_MD5 ? "md5" : "sha256";                                                          \
+        char *algo_name;                                                                                               \
+                                                                                                                       \
+        if (algo == CMD_HELP) {                                                                                        \
+            algo_name = "help";                                                                                        \
+        } else if (algo == CMD_MD5) {                                                                                  \
+            algo_name = "md5";                                                                                         \
+        } else {                                                                                                       \
+            algo_name = "sha256";                                                                                      \
+        }                                                                                                              \
                                                                                                                        \
         write(STDERR_FILENO, algo_name, len(algo_name));                                                               \
         write(STDERR_FILENO, ": Unknown option or message digest: ", 36);                                              \
@@ -22,7 +29,6 @@
         write(STDERR_FILENO, "\n", 1);                                                                                 \
         write(STDERR_FILENO, algo_name, len(algo_name));                                                               \
         write(STDERR_FILENO, ": Use -help for summary.\n", 25);                                                        \
-        return -1;                                                                                                     \
     }
 
 typedef struct {
@@ -100,15 +106,30 @@ options_cleanup(File *head) {
 }
 
 Command
+options_get_command(const char *const cmd) {
+    if (!cmp("md5", (void *)cmd)) {
+        return CMD_MD5;
+    } else if (!cmp("sha256", (void *)cmd)) {
+        return CMD_SHA256;
+    } else if (!cmp("help", (void *)cmd)) {
+        return CMD_HELP;
+    } else {
+        return CMD_INVALID;
+    }
+}
+
+Command
 options_parse(struct Options *const opts, char **av) {
     Command cmd;
 
-    if (!cmp("md5", av[1])) {
-        cmd = CMD_MD5;
-    } else if (!cmp("sha256", av[1])) {
-        cmd = CMD_SHA256;
-    } else {
+    if ((cmd = options_get_command(av[1])) == CMD_INVALID) {
         INVALID_COMMAND(av[1]);
+        return CMD_INVALID;
+    }
+
+    if (cmd == CMD_HELP && av[2]) {
+        INVALID_OPTION(cmd, av[2]);
+        return CMD_INVALID;
     }
 
     for (int idx = 2; av[idx]; ++idx) {
@@ -122,14 +143,17 @@ options_parse(struct Options *const opts, char **av) {
             if (entry->s == NULL) {
                 options_cleanup(opts->targets);
                 INVALID_OPTION(cmd, av[idx]);
+                return -1;
             }
 
             entry->handler(opts);
+
         } else {
             File *new = file_new(av[idx]);
             if (!new) {
                 options_cleanup(opts->targets);
                 MALLOC_ERROR("");
+                return -1;
             }
 
             file_add_back(&opts->targets, new);

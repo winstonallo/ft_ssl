@@ -8,6 +8,7 @@ typedef int (*Algo)(const Options *const);
 static const Algo algo_map[] = {
     md5,    // CMD_MD5
     sha256, // CMD_SHA256
+    help,   // CMD_HELP
 };
 
 int
@@ -23,8 +24,6 @@ main(int ac, char **av) {
         options_cleanup(opts.targets);
         return EXIT_FAILURE;
     }
-
-    
 
     algo_map[cmd](&opts);
 

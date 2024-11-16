@@ -1,4 +1,5 @@
 -Iinc
+-I./libft/include
 -Wall
 -Wextra
 -Werror
