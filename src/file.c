@@ -8,18 +8,6 @@
 #include <unistd.h>
 
 char *
-file_realloc(char *old_buf, ssize_t new_size) {
-    char *new_buf = ft_calloc(new_size, sizeof(char));
-    if (!new_buf) {
-        return NULL;
-    }
-
-    ft_strlcpy(new_buf, old_buf, ft_strlen(old_buf));
-
-    return new_buf;
-}
-
-char *
 file_read(int fd) {
     ssize_t total_size = 0;
     ssize_t allocated = BUFSIZ;
@@ -36,7 +24,7 @@ file_read(int fd) {
 
         if (total_size >= allocated) {
             allocated *= 2;
-            char *tmp = file_realloc(buf, allocated);
+            char *tmp = buf_realloc(buf, allocated);
             if (!tmp) {
                 free(buf);
                 perror("buffer reallocation");

@@ -5,7 +5,7 @@ SRC_DIR = src
 INC_DIR = inc
 LIBFT_DIR = libft
 
-SRCS = ssl.c md5.c sha256.c options.c file.c help.c
+SRCS = ssl.c md5.c sha256.c options.c file.c help.c alloc.c
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 
 LIBFT = $(LIBFT_DIR)/libft.a

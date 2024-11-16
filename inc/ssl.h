@@ -2,6 +2,7 @@
 #define SSL_H
 
 #include <stdbool.h>
+#include <sys/types.h>
 
 #define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
 
@@ -43,6 +44,9 @@ int help(Options *const opts);
 // options.c
 Command options_parse(struct Options *const args, char **argv);
 void options_cleanup(File *head);
+
+// alloc.c
+char *buf_realloc(char *old_buf, ssize_t new_size);
 
 // file.c
 int file_read_all(Options *const opts);
