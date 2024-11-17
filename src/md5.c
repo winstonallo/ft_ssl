@@ -4,39 +4,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define DFLT_A 0x67452301
-#define DFLT_B 0xefcdab89
-#define DFLT_C 0x98badcfe
-#define DFLT_D 0x10325476
-
 #define MD5_BLOCK_SIZE 64 // 512 bits
 
 // Rotates `x` to the left by `n` bits
 #define ROTL(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
-typedef struct Words {
-    uint32_t A;
-    uint32_t B;
-    uint32_t C;
-    uint32_t D;
-} Words;
-
-typedef struct Message {
-    union {
-        uint8_t *bytes;
-        uint32_t *words;
-    } buf;
-
-    size_t len;
-} Message;
+#define DFLT_A 0x67452301
+#define DFLT_B 0xefcdab89
+#define DFLT_C 0x98badcfe
+#define DFLT_D 0x10325476
 
 // The values for K are derived from following formula:
 // `abs(sin(i + 1)) x pow(2, 32)`
+//
 // The indices used are defined by the current md5 round:
-// Round 1: K[0..15]
-// Round 2: K[16..31]
-// Round 3: K[32..47]
-// Round 4: K[48..63]
+// - Round 1: `K[0..15]`
+// - Round 2: `K[16..31]`
+// - Round 3: `K[32..47]`
+// - Round 4: `K[48..63]`
 static const uint32_t K[] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501, 0x698098d8, 0x8b44f7af, 0xffff5bb1,
                              0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821, 0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453,
                              0xd8a1e681, 0xe7d3fbc8, 0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a, 0xfffa3942,
@@ -47,16 +32,17 @@ static const uint32_t K[] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf
 static const uint32_t s[] = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20,
                              4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
 
-// Safety:
-// `block` is assumed to be a buffer with a capacity of MD5_BLOCK_SIZE (512 bits,
-// or 16 x 32 bit words).
-void
-md5_get_next_block(Message msg, size_t processed, uint32_t *block) {
-    for (int idx = 0; idx < 16; ++idx) {
-        block[idx] = msg.buf.words[idx + processed * 16];
-        printf("%08x\n", block[idx]);
-    }
-}
+typedef struct Words {
+    uint32_t A;
+    uint32_t B;
+    uint32_t C;
+    uint32_t D;
+} Words;
+
+typedef struct Message {
+    uint8_t *bytes;
+    size_t len;
+} Message;
 
 size_t
 md5_calculate_padding(size_t original_size) {
@@ -76,27 +62,23 @@ md5_pad(char *buf) {
     Message msg = {0};
 
     uint64_t buf_len = ft_strlen(buf);
-    size_t padding_size = md5_calculate_padding(buf_len);
-    printf("padding size: %zu\n", padding_size);
+    uint64_t padding_size = md5_calculate_padding(buf_len);
 
-    size_t new_size = buf_len + padding_size + 1 + 8;
+    uint64_t new_size = buf_len + padding_size + 1 + 8;
 
-    msg.buf.bytes = malloc(sizeof(char) * new_size);
-    if (!msg.buf.bytes) {
+    msg.bytes = ft_calloc(new_size, sizeof(char));
+    if (!msg.bytes) {
         return msg;
     }
 
-    ft_memcpy(msg.buf.bytes, buf, buf_len);
-    msg.buf.bytes[buf_len] = (char)0x80;
-    ft_memset(msg.buf.bytes + buf_len + 1, 0, padding_size);
-    *(size_t *)(&buf[new_size - 8]) = buf_len * 8;
+    ft_memcpy(msg.bytes, buf, buf_len);
+    msg.bytes[buf_len] = (char)0x80;
+    *(uint64_t *)(&msg.bytes[new_size - 8]) = buf_len * 8;
 
     msg.len = new_size;
 
     return msg;
 }
-
-typedef uint32_t (*MD5_Round)(uint32_t, uint32_t, uint32_t);
 
 void
 md5_print(uint32_t A, uint32_t B, uint32_t C, uint32_t D, const char *filename) {
@@ -117,7 +99,7 @@ md5_hash(char *buf, Words words) {
     uint32_t c0 = DFLT_C;
     uint32_t d0 = DFLT_D;
 
-    for (unsigned char *chunk = msg.buf.bytes; (size_t)chunk - (size_t)msg.buf.bytes < msg.len; chunk += MD5_BLOCK_SIZE) {
+    for (uint8_t *chunk = msg.bytes; (size_t)chunk - (size_t)msg.bytes < msg.len; chunk += MD5_BLOCK_SIZE) {
 
         uint32_t *block = (void *)chunk;
         uint32_t A = a0;
@@ -161,7 +143,7 @@ md5_hash(char *buf, Words words) {
     words.C = c0;
     words.D = d0;
 
-    free(msg.buf.bytes);
+    free(msg.bytes);
     return words;
 }
 
