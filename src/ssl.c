@@ -1,7 +1,7 @@
 #include "ssl.h"
-#include "libft.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 typedef int (*Algo)(char *, char *);
@@ -9,8 +9,11 @@ typedef int (*Algo)(char *, char *);
 static const Algo algo_map[] = {
     md5,    // CMD_MD5
     sha256, // CMD_SHA256
-    help,   // CMD_HELP
 };
+
+static const char *algo_names[] = {"md5\0", "sha256\0"};
+
+static const u_int64_t algo_buffer_sizes[] = {33, 256};
 
 int
 main(int ac, char **av) {
@@ -27,16 +30,22 @@ main(int ac, char **av) {
         return EXIT_FAILURE;
     }
 
-    if (cmd != CMD_HELP && file_read_all(&opts) == -1) {
+    if (cmd == CMD_HELP) {
+        help(NULL, NULL);
+        options_cleanup(opts.targets);
+        return EXIT_SUCCESS;
+    }
+
+    if (file_read_all(&opts) == -1) {
         options_cleanup(opts.targets);
         return EXIT_FAILURE;
     }
 
-    char buf[33];
-
-    algo_map[cmd](opts.targets->content, buf);
-
-    ft_printf(STDOUT_FILENO, "%s\n", buf);
+    for (File *it = opts.targets; it; it = it->next) {
+        char buf[algo_buffer_sizes[cmd]];
+        algo_map[cmd](opts.targets->content, buf);
+        display(buf, (char *)algo_names[cmd], (char *)it->path, &opts);
+    }
 
     options_cleanup(opts.targets);
     return EXIT_SUCCESS;
