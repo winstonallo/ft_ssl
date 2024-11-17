@@ -14,7 +14,7 @@
 #define DFLT_D 0x10325476
 
 // The values for K are derived from following formula:
-// `abs(sin(i + 1)) x pow(2, 32)`
+// `abs(sin(i + 1)) * pow(2, 32)`
 //
 // The indices used are defined by the current MD5 round:
 // - Round 1: `K[0..15]`
