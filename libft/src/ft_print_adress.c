@@ -31,7 +31,7 @@ ft_fill_string(unsigned long n, int *strlen) {
 }
 
 int
-ft_print_adress(unsigned long n, int font) {
+ft_print_adress(int fd, unsigned long n, int font) {
     unsigned long temp;
     char *res;
     int i;
@@ -50,10 +50,10 @@ ft_print_adress(unsigned long n, int font) {
         temp = temp / 16;
     }
     i = ft_strlen(res);
-    i += ft_putstr_int("0x");
+    i += ft_putstr_int(fd, "0x");
     ft_putstr_fd(res, 1);
     free(res);
     if (n == 0)
-        i += ft_putchar_int('0');
+        i += ft_putchar_int(fd, '0');
     return (i);
 }

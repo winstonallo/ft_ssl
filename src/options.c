@@ -6,11 +6,7 @@
 #include <unistd.h>
 
 #define INVALID_COMMAND(cmd)                                                                                                                                   \
-    {                                                                                                                                                          \
-        write(STDERR_FILENO, "Invalid command '", 18);                                                                                                         \
-        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                                                             \
-        write(STDERR_FILENO, "'; type \"help\" for a list.\n", 28);                                                                                            \
-    }
+    { ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"help\" for a list.\n", cmd); }
 
 #define INVALID_OPTION(algo, cmd)                                                                                                                              \
     {                                                                                                                                                          \
@@ -23,13 +19,7 @@
         } else {                                                                                                                                               \
             algo_name = "sha256";                                                                                                                              \
         }                                                                                                                                                      \
-                                                                                                                                                               \
-        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                                                                 \
-        write(STDERR_FILENO, ": Unknown option or message digest: ", 36);                                                                                      \
-        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                                                             \
-        write(STDERR_FILENO, "\n", 1);                                                                                                                         \
-        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                                                                 \
-        write(STDERR_FILENO, ": Use -help for summary.\n", 25);                                                                                                \
+        ft_printf(STDERR_FILENO, "%s: Unknown option for message digest: %s\n%s: Use -help for summary.\n", algo_name, cmd, algo_name);                        \
     }
 
 typedef void (*OptionHandler)(struct Options *const);
