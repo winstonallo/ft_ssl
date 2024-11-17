@@ -52,4 +52,7 @@ int file_read_all(Options *const opts);
 // hex.c
 void byte_to_hex(u_int8_t byte, char *buf, int *idx);
 
+// display.c
+void display(char *hash, char *algo_name, char *file_path, const struct Options *const opts);
+
 #endif
