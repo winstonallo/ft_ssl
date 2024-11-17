@@ -16,7 +16,7 @@
 // The values for K are derived from following formula:
 // `abs(sin(i + 1)) x pow(2, 32)`
 //
-// The indices used are defined by the current md5 round:
+// The indices used are defined by the current MD5 round:
 // - Round 1: `K[0..15]`
 // - Round 2: `K[16..31]`
 // - Round 3: `K[32..47]`
@@ -107,7 +107,7 @@ md5_store_to_buf(char *buf, Words words) {
     buf[idx] = '\0';
 }
 
-int
+static int
 md5_hash(char *buf, Words *words) {
     Message msg = md5_pad(buf);
     if (!msg.bytes) {
