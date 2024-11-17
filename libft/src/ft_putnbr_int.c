@@ -38,7 +38,7 @@ ft_allocate_room(int i) {
 }
 
 int
-ft_putnbr_int(int n) {
+ft_putnbr_int(int fd, int n) {
     long ln;
     size_t i;
     char *res;
@@ -59,7 +59,7 @@ ft_putnbr_int(int n) {
     }
     if (n < 0)
         *(res + 0) = '-';
-    ft_putstr_fd(res, 1);
+    ft_putstr_fd(res, fd);
     free(res);
     return (len);
 }

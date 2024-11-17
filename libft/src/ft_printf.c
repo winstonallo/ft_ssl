@@ -13,34 +13,34 @@
 #include "../include/libft.h"
 
 static int
-ft_distribute_args(const char *s, void *arg) {
+ft_distribute_args(int fd, const char *s, void *arg) {
     int i;
     unsigned long ptr;
 
     i = 0;
     if (*s == 's')
-        i += ft_putstr_int((char *)arg);
+        i += ft_putstr_int(fd, (char *)arg);
     if (*s == 'c')
-        i += ft_putchar_int(*(char *)&arg);
+        i += ft_putchar_int(fd, *(char *)&arg);
     else if (*s == 'p') {
         ptr = (unsigned long)arg;
         if (ptr)
-            i += ft_print_adress((unsigned long)arg, 87);
+            i += ft_print_adress(fd, (unsigned long)arg, 87);
         else
-            i += (ft_putstr_int("(nil)"));
+            i += (ft_putstr_int(fd, "(nil)"));
     } else if (*s == 'd' || *s == 'i')
-        i += ft_putnbr_int(*(int *)&arg);
+        i += ft_putnbr_int(fd, *(int *)&arg);
     else if (*s == 'u')
-        i += ft_putnbr_unsigned_int(*(int *)&arg);
+        i += ft_putnbr_unsigned_int(fd, *(int *)&arg);
     else if (*s == 'x')
-        i += ft_puthex_int(*(int *)&arg, 87);
+        i += ft_puthex_int(fd, *(int *)&arg, 87);
     else if (*s == 'X')
-        i += ft_puthex_int(*(int *)&arg, 55);
+        i += ft_puthex_int(fd, *(int *)&arg, 55);
     return (i);
 }
 
 int
-ft_printf(const char *s, ...) {
+ft_printf(int fd, const char *s, ...) {
     va_list args;
     int i;
 
@@ -52,11 +52,11 @@ ft_printf(const char *s, ...) {
         if (*s == '%') {
             s++;
             if (ft_strchr("cspdiuxX", *s))
-                i += ft_distribute_args(s, va_arg(args, void *));
+                i += ft_distribute_args(fd, s, va_arg(args, void *));
             else if (*s == '%')
-                i += ft_putchar_int('%');
+                i += ft_putchar_int(fd, '%');
         } else
-            i += ft_putchar_int(*s);
+            i += ft_putchar_int(fd, *s);
         s++;
     }
     va_end(args);

@@ -38,7 +38,7 @@ ft_allocate_room(int i) {
 }
 
 int
-ft_putnbr_unsigned_int(unsigned int n) {
+ft_putnbr_unsigned_int(int fd, unsigned int n) {
     long ln;
     size_t i;
     char *res;
@@ -53,7 +53,7 @@ ft_putnbr_unsigned_int(unsigned int n) {
         *(res + i) = ln % 10 + 48;
         ln = ln / 10;
     }
-    ft_putstr_int(res);
+    ft_putstr_int(fd, res);
     free(res);
     return (len);
 }

@@ -31,7 +31,7 @@ create_string(unsigned int n, int *strlen) {
 }
 
 int
-ft_puthex_int(int n, int font) {
+ft_puthex_int(int fd, int n, int font) {
     unsigned int temp;
     char *str;
     int i;
@@ -50,10 +50,10 @@ ft_puthex_int(int n, int font) {
         temp = temp / 16;
         i--;
     }
-    ft_putstr_fd(str, 1);
+    ft_putstr_fd(str, fd);
     i = ft_strlen(str);
     free(str);
     if (n == 0)
-        i += ft_putchar_int('0');
+        i += ft_putchar_int(fd, '0');
     return (i);
 }
