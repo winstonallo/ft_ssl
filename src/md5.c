@@ -176,16 +176,13 @@ md5_hash(char *buf, Words *words) {
 // be used for anything else than educational purposes.
 // https://en.wikipedia.org/wiki/MD5
 int
-md5(File *targets, char *buf) {
-    for (File *it = targets; it; it = it->next) {
-        Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D};
+md5(char *msg, char *buf) {
+    Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D};
 
-        if (md5_hash(it->content, &words) == -1) {
-            return -1;
-        }
-
-        md5_store_to_buf(buf, words);
+    if (md5_hash(msg, &words) == -1) {
+        return -1;
     }
 
+    md5_store_to_buf(buf, words);
     return 0;
 }

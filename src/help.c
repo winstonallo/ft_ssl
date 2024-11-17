@@ -1,9 +1,8 @@
-#include "ssl.h"
 #include <unistd.h>
 
 int
-help(File *targets, char *buf) {
-    (void)targets;
+help(char *msg, char *buf) {
+    (void)msg;
     (void)buf;
 
     write(STDERR_FILENO, "help:\n\n", 7);

@@ -31,13 +31,13 @@ typedef enum Command {
 } Command;
 
 // md5.c
-int md5(File *targets, char *buf);
+int md5(char *msg, char *buf);
 
 // sha256.c
-int sha256(File *targets, char *buf);
+int sha256(char *msg, char *buf);
 
 // help.c
-int help(File *targets, char *buf);
+int help(char *msg, char *buf);
 
 // options.c
 Command options_parse(struct Options *const args, char **argv);

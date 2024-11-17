@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-typedef int (*Algo)(File *, char *);
+typedef int (*Algo)(char *, char *);
 
 static const Algo algo_map[] = {
     md5,    // CMD_MD5
@@ -33,7 +33,7 @@ main(int ac, char **av) {
 
     char buf[33];
 
-    algo_map[cmd](opts.targets, buf);
+    algo_map[cmd](opts.targets->content, buf);
 
     ft_printf(STDOUT_FILENO, "%s\n", buf);
 
