@@ -30,8 +30,6 @@ typedef enum Command {
     CMD_HELP = 2,
 } Command;
 
-typedef void (*OptionHandler)(struct Options *const);
-
 // md5.c
 int md5(Options *const opts);
 

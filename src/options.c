@@ -5,34 +5,34 @@
 #include <time.h>
 #include <unistd.h>
 
-
-
-#define INVALID_COMMAND(cmd)                                                                                           \
-    {                                                                                                                  \
-        write(STDERR_FILENO, "Invalid command '", 18);                                                                 \
-        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                     \
-        write(STDERR_FILENO, "'; type \"help\" for a list.\n", 28);                                                    \
+#define INVALID_COMMAND(cmd)                                                                                                                                   \
+    {                                                                                                                                                          \
+        write(STDERR_FILENO, "Invalid command '", 18);                                                                                                         \
+        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                                                             \
+        write(STDERR_FILENO, "'; type \"help\" for a list.\n", 28);                                                                                            \
     }
 
-#define INVALID_OPTION(algo, cmd)                                                                                      \
-    {                                                                                                                  \
-        char *algo_name;                                                                                               \
-                                                                                                                       \
-        if (algo == CMD_HELP) {                                                                                        \
-            algo_name = "help";                                                                                        \
-        } else if (algo == CMD_MD5) {                                                                                  \
-            algo_name = "md5";                                                                                         \
-        } else {                                                                                                       \
-            algo_name = "sha256";                                                                                      \
-        }                                                                                                              \
-                                                                                                                       \
-        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                         \
-        write(STDERR_FILENO, ": Unknown option or message digest: ", 36);                                              \
-        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                     \
-        write(STDERR_FILENO, "\n", 1);                                                                                 \
-        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                         \
-        write(STDERR_FILENO, ": Use -help for summary.\n", 25);                                                        \
+#define INVALID_OPTION(algo, cmd)                                                                                                                              \
+    {                                                                                                                                                          \
+        char *algo_name;                                                                                                                                       \
+                                                                                                                                                               \
+        if (algo == CMD_HELP) {                                                                                                                                \
+            algo_name = "help";                                                                                                                                \
+        } else if (algo == CMD_MD5) {                                                                                                                          \
+            algo_name = "md5";                                                                                                                                 \
+        } else {                                                                                                                                               \
+            algo_name = "sha256";                                                                                                                              \
+        }                                                                                                                                                      \
+                                                                                                                                                               \
+        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                                                                 \
+        write(STDERR_FILENO, ": Unknown option or message digest: ", 36);                                                                                      \
+        write(STDERR_FILENO, cmd, ft_strlen(cmd));                                                                                                             \
+        write(STDERR_FILENO, "\n", 1);                                                                                                                         \
+        write(STDERR_FILENO, algo_name, ft_strlen(algo_name));                                                                                                 \
+        write(STDERR_FILENO, ": Use -help for summary.\n", 25);                                                                                                \
     }
+
+typedef void (*OptionHandler)(struct Options *const);
 
 typedef struct {
     const char *s;
@@ -40,22 +40,22 @@ typedef struct {
     OptionHandler handler;
 } OptionEntry;
 
-void
+static void
 options_add_p(Options *const opts) {
     opts->p = true;
 }
 
-void
+static void
 options_add_q(Options *const opts) {
     opts->q = true;
 }
 
-void
+static void
 options_add_r(Options *const opts) {
     opts->r = true;
 }
 
-void
+static void
 options_add_s(Options *const opts) {
     opts->s = true;
 }
@@ -68,7 +68,7 @@ static const OptionEntry option_map[] = {
     {NULL, NULL,        NULL         },
 };
 
-File *
+static File *
 file_new(const char *const path) {
     File *file = malloc(sizeof(File));
     if (!file) {
@@ -81,7 +81,7 @@ file_new(const char *const path) {
     return file;
 }
 
-void
+static void
 file_add_back(File **head, File *new) {
     if (!head || !*head) {
         *head = new;
@@ -97,19 +97,7 @@ file_add_back(File **head, File *new) {
     it->next = new;
 }
 
-void
-options_cleanup(File *head) {
-    File *prev;
-
-    while (head) {
-        free(head->content);
-        prev = head;
-        head = head->next;
-        free(prev);
-    }
-}
-
-Command
+static Command
 options_get_command(const char *const cmd) {
     if (!ft_strncmp("md5", (void *)cmd, 4)) {
         return CMD_MD5;
@@ -122,6 +110,57 @@ options_get_command(const char *const cmd) {
     }
 }
 
+static int
+options_add_opt(Options *const opts, Command cmd, const char *const arg) {
+    const OptionEntry *entry = option_map;
+    while (entry->s != NULL && STRCMP(entry->s, arg) && STRCMP(entry->l, arg)) {
+        entry++;
+    }
+
+    if (entry->s == NULL) {
+        options_cleanup(opts->targets);
+        INVALID_OPTION(cmd, arg);
+        return -1;
+    }
+
+    entry->handler(opts);
+    return 0;
+}
+
+static int
+options_add_file(Options *const opts, const char *const arg) {
+    File *new = file_new(arg);
+
+    if (!new) {
+        options_cleanup(opts->targets);
+        MALLOC_ERROR("could not allocate memory");
+        return -1;
+    }
+
+    file_add_back(&opts->targets, new);
+    return 0;
+}
+
+// Cleans up all heap memory allocated for dynamic content (as of now only message
+// buffers and their linked list pointers).
+// Safety:
+// - This does not clean up the Options struct, as it is assumed to be stack
+// allocated.
+void
+options_cleanup(File *head) {
+    File *prev;
+
+    while (head) {
+        free(head->content);
+        prev = head;
+        head = head->next;
+        free(prev);
+    }
+}
+
+// Parses through the argument vector and fills `opts` with the resulting options and
+// message paths.
+// Best called with an Options struct allocated in main, on the stack.
 Command
 options_parse(struct Options *const opts, char **av) {
     Command cmd;
@@ -137,40 +176,15 @@ options_parse(struct Options *const opts, char **av) {
     }
 
     for (int idx = 2; av[idx]; ++idx) {
-        if (av[idx][0] == '-') {
-
-            const OptionEntry *entry = option_map;
-            while (entry->s != NULL && STRCMP(entry->s, av[idx]) && STRCMP(entry->l, av[idx])) {
-                entry++;
-            }
-
-            if (entry->s == NULL) {
-                options_cleanup(opts->targets);
-                INVALID_OPTION(cmd, av[idx]);
-                return -1;
-            }
-
-            entry->handler(opts);
-
-        } else {
-            File *new = file_new(av[idx]);
-            if (!new) {
-                options_cleanup(opts->targets);
-                MALLOC_ERROR("could not allocate memory");
-                return -1;
-            }
-
-            file_add_back(&opts->targets, new);
+        if (av[idx][0] == '-' && options_add_opt(opts, cmd, av[idx]) == -1) {
+            return -1;
+        } else if (options_add_file(opts, av[idx]) == -1) {
+            return -1;
         }
     }
 
-    if (opts->targets == NULL) {
-        opts->targets = file_new("stdin");
-        if (!opts->targets) {
-            options_cleanup(opts->targets);
-            MALLOC_ERROR("could not allocate memory");
-            return -1;
-        }
+    if (opts->targets == NULL && options_add_file(opts, "stdin") == -1) {
+        return -1;
     }
 
     return cmd;
