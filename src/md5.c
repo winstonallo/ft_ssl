@@ -75,15 +75,6 @@ md5_pad(char *buf) {
     return msg;
 }
 
-void
-byte_to_hex(uint8_t byte, char *buf, int *idx) {
-    static const char digits[] = "0123456789abcdef";
-
-    buf[*idx] = digits[(byte >> 4) & 0x0F];
-    buf[*idx + 1] = digits[(byte) & 0x0F];
-    *idx += 2;
-}
-
 static void
 md5_store_to_buf(char *buf, Words words) {
     uint32_t A = words.A;

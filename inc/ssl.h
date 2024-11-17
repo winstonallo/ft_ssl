@@ -49,4 +49,7 @@ char *buf_realloc(char *old_buf, ssize_t new_size);
 // file.c
 int file_read_all(Options *const opts);
 
+// hex.c
+void byte_to_hex(u_int8_t byte, char *buf, int *idx);
+
 #endif
