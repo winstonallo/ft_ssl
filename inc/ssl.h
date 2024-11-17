@@ -6,7 +6,7 @@
 
 #define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
 
-#define MALLOC_ERROR(msg)                                                                                              \
+#define MALLOC_ERROR(msg)                                                                                                                                      \
     { perror(msg); }
 
 typedef struct File {
@@ -31,13 +31,13 @@ typedef enum Command {
 } Command;
 
 // md5.c
-int md5(Options *const opts);
+int md5(File *targets, char *buf);
 
 // sha256.c
-int sha256(Options *const opts);
+int sha256(File *targets, char *buf);
 
 // help.c
-int help(Options *const opts);
+int help(File *targets, char *buf);
 
 // options.c
 Command options_parse(struct Options *const args, char **argv);

@@ -1,7 +1,8 @@
 #include "ssl.h"
 
 int
-sha256(Options *const opts) {
-    (void)opts;
+sha256(File *targets, char *buf) {
+    (void)targets;
+    (void)buf;
     return 0;
 }

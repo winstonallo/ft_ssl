@@ -1,8 +1,10 @@
 #include "ssl.h"
+#include "libft.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-typedef int (*Algo)(Options *const);
+typedef int (*Algo)(File *, char *);
 
 static const Algo algo_map[] = {
     md5,    // CMD_MD5
@@ -29,7 +31,11 @@ main(int ac, char **av) {
         return EXIT_FAILURE;
     }
 
-    algo_map[cmd](&opts);
+    char buf[33];
+
+    algo_map[cmd](opts.targets, buf);
+
+    ft_printf(STDOUT_FILENO, "%s\n", buf);
 
     options_cleanup(opts.targets);
 }

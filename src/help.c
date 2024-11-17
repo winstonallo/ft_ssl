@@ -2,8 +2,9 @@
 #include <unistd.h>
 
 int
-help(Options *const opts) {
-    (void)opts;
+help(File *targets, char *buf) {
+    (void)targets;
+    (void)buf;
 
     write(STDERR_FILENO, "help:\n\n", 7);
     write(STDERR_FILENO, "Message Digest commands\n", 24);

@@ -1,7 +1,6 @@
 #include "libft.h"
 #include "ssl.h"
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #define MD5_BLOCK_SIZE 64 // 512 bits
@@ -46,15 +45,11 @@ typedef struct Message {
 
 size_t
 md5_calculate_padding(size_t original_size) {
-    size_t padding_size;
-
     if (original_size % 64 > 55) {
-        padding_size = MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) + 56;
+        return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) + 56;
     } else {
-        padding_size = MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) - 8;
+        return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) - 8;
     }
-
-    return padding_size;
 }
 
 Message
@@ -81,18 +76,52 @@ md5_pad(char *buf) {
 }
 
 void
-md5_print(uint32_t A, uint32_t B, uint32_t C, uint32_t D, const char *filename) {
-    printf("MD5(%s)= ", filename);
-    printf("%02x%02x%02x%02x", A & 0xFF, (A >> 8) & 0xFF, (A >> 16) & 0xFF, (A >> 24) & 0xFF);
-    printf("%02x%02x%02x%02x", B & 0xFF, (B >> 8) & 0xFF, (B >> 16) & 0xFF, (B >> 24) & 0xFF);
-    printf("%02x%02x%02x%02x", C & 0xFF, (C >> 8) & 0xFF, (C >> 16) & 0xFF, (C >> 24) & 0xFF);
-    printf("%02x%02x%02x%02x", D & 0xFF, (D >> 8) & 0xFF, (D >> 16) & 0xFF, (D >> 24) & 0xFF);
-    printf("\n");
+byte_to_hex(uint8_t byte, char *buf, int *idx) {
+    static const char digits[] = "0123456789abcdef";
+
+    buf[*idx] = digits[(byte >> 4) & 0x0F];
+    buf[*idx + 1] = digits[(byte) & 0x0F];
+    *idx += 2;
 }
 
-Words
-md5_hash(char *buf, Words words) {
+static void
+md5_store_to_buf(char *buf, Words words) {
+    uint32_t A = words.A;
+    uint32_t B = words.B;
+    uint32_t C = words.C;
+    uint32_t D = words.D;
+
+    int idx = 0;
+
+    byte_to_hex(A & 0xFF, buf, &idx);
+    byte_to_hex((A >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((A >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((A >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(B & 0xFF, buf, &idx);
+    byte_to_hex((B >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((B >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((B >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(C & 0xFF, buf, &idx);
+    byte_to_hex((C >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((C >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((C >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(D & 0xFF, buf, &idx);
+    byte_to_hex((D >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((D >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((D >> 24) & 0xFF, buf, &idx);
+
+    buf[idx] = '\0';
+}
+
+int
+md5_hash(char *buf, Words *words) {
     Message msg = md5_pad(buf);
+    if (!msg.bytes) {
+        return -1;
+    }
 
     uint32_t a0 = DFLT_A;
     uint32_t b0 = DFLT_B;
@@ -138,23 +167,33 @@ md5_hash(char *buf, Words words) {
         d0 += D;
     }
 
-    words.A = a0;
-    words.B = b0;
-    words.C = c0;
-    words.D = d0;
+    words->A = a0;
+    words->B = b0;
+    words->C = c0;
+    words->D = d0;
 
     free(msg.bytes);
-    return words;
+    return 0;
 }
 
+// Memory Safety:
+// `buf` is assumed to be a buffer capable of holding `33 bytes` (the size of
+// the MD5 hash function's output + `\0`). Failure to ensure this will lead to
+// memory corruption.
+// Cryptographic Safety:
+// - The MD5 hash algorithm is not collision-resistant. This should not
+// be used for anything else than educational purposes.
+// https://en.wikipedia.org/wiki/MD5
 int
-md5(Options *const opts) {
-    for (File *it = opts->targets; it; it = it->next) {
+md5(File *targets, char *buf) {
+    for (File *it = targets; it; it = it->next) {
         Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D};
 
-        Words hashed_words = md5_hash(it->content, words);
+        if (md5_hash(it->content, &words) == -1) {
+            return -1;
+        }
 
-        md5_print(hashed_words.A, hashed_words.B, hashed_words.C, hashed_words.D, it->path);
+        md5_store_to_buf(buf, words);
     }
 
     return 0;
