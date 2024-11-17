@@ -15,7 +15,8 @@ static const Algo algo_map[] = {
 int
 main(int ac, char **av) {
     if (ac < 2) {
-        return 2;
+        help(NULL, NULL);
+        return EXIT_SUCCESS;
     }
 
     struct Options opts = {0};
@@ -38,4 +39,5 @@ main(int ac, char **av) {
     ft_printf(STDOUT_FILENO, "%s\n", buf);
 
     options_cleanup(opts.targets);
+    return EXIT_SUCCESS;
 }
