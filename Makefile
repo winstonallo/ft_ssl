@@ -37,8 +37,9 @@ fclean: clean
 re: fclean all
 
 prof:
+	FILE_NAME="/tmp/.out" ./tests/generate_random_file.sh
 	make CFLAGS="${CFLAGS} -pg -g"
-	valgrind --tool=callgrind ./ft_ssl ${ALGO} ${TARGET}
+	valgrind --tool=callgrind ./ft_ssl ${ALGO} /tmp/.out
 	callgrind_annotate callgrind.out.* >> ${OUTFILE}
 	rm callgrind.out.* gmon.out
 
