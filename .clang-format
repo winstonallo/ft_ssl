@@ -1,6 +1,6 @@
 AlignArrayOfStructures: Left
 IndentWidth: 4
-ColumnLimit: 160
+ColumnLimit: 120
 AllowAllArgumentsOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AlwaysBreakAfterDefinitionReturnType: All

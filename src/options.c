@@ -5,21 +5,22 @@
 #include <time.h>
 #include <unistd.h>
 
-#define INVALID_COMMAND(cmd)                                                                                                                                   \
+#define INVALID_COMMAND(cmd)                                                                                           \
     { ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"help\" for a list.\n", cmd); }
 
-#define INVALID_OPTION(algo, cmd)                                                                                                                              \
-    {                                                                                                                                                          \
-        char *algo_name;                                                                                                                                       \
-                                                                                                                                                               \
-        if (algo == CMD_HELP) {                                                                                                                                \
-            algo_name = "help";                                                                                                                                \
-        } else if (algo == CMD_MD5) {                                                                                                                          \
-            algo_name = "md5";                                                                                                                                 \
-        } else {                                                                                                                                               \
-            algo_name = "sha256";                                                                                                                              \
-        }                                                                                                                                                      \
-        ft_printf(STDERR_FILENO, "%s: Unknown option for message digest: %s\n%s: Use -help for summary.\n", algo_name, cmd, algo_name);                        \
+#define INVALID_OPTION(algo, cmd)                                                                                      \
+    {                                                                                                                  \
+        char *algo_name;                                                                                               \
+                                                                                                                       \
+        if (algo == CMD_HELP) {                                                                                        \
+            algo_name = "help";                                                                                        \
+        } else if (algo == CMD_MD5) {                                                                                  \
+            algo_name = "md5";                                                                                         \
+        } else {                                                                                                       \
+            algo_name = "sha256";                                                                                      \
+        }                                                                                                              \
+        ft_printf(STDERR_FILENO, "%s: Unknown option for message digest: %s\n%s: Use -help for summary.\n", algo_name, \
+                  cmd, algo_name);                                                                                     \
     }
 
 typedef void (*OptionHandler)(struct Options *const);
