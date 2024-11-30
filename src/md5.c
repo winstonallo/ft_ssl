@@ -169,7 +169,7 @@ md5_hash(File *msg, Words *words) {
             A = D;
             D = C;
             C = B;
-            B += rotl(F, s[step]);
+            B += rotl_32(F, s[step]);
         }
 
         a0 += A;
