@@ -22,7 +22,7 @@ file_read(int fd) {
     while ((bytes_read = read(fd, buf + total_size, allocated - total_size)) > 0) {
         total_size += bytes_read;
 
-        printf("buf (len %zu): %s\n", total_size, buf);
+        // printf("buf (len %zu)\n", total_size);
         if (total_size >= allocated) {
             allocated *= 2;
             u_int8_t *tmp = buf_realloc(buf, allocated, total_size);
