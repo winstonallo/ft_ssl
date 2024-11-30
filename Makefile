@@ -39,7 +39,7 @@ re: fclean all
 prof:
 	make CFLAGS="${CFLAGS} -pg"
 	valgrind --tool=callgrind ./ft_ssl ${ALGO} ${TARGET}
-	callgrind_annotate callgrind.out.* > analysis.txt
+	callgrind_annotate callgrind.out.* > ${OUTFILE}
 	rm callgrind.out.* gmon.out
 
 $(LIBFT):
