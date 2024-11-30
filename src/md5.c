@@ -159,24 +159,9 @@ md5_hash(File *msg, Words *words) {
                 F = C ^ (B | (~D));
             }
 
-            // switch (step / 16) {
-            // case 0:
-            //     F = (B & C) | ((~B) & D);
-            //     break;
-            // case 1:
-            //     F = (D & B) | ((~D) & C);
-            //     break;
-            // case 2:
-            //     F = B ^ C ^ D;
-            //     break;
-            // case 3:
-            //     F = C ^ (B | (~D));
-            //     break;
-            // }
-
             g = block_idx[step];
 
-            F = F + A + K[step] + block[g];
+            F += A + K[step] + block[g];
             A = D;
             D = C;
             C = B;
