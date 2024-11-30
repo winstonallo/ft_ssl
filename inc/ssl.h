@@ -12,6 +12,7 @@
 typedef struct File {
     const char *path;
     void *content;
+    u_int64_t content_size;
     struct File *next;
 } File;
 
@@ -31,10 +32,10 @@ typedef enum Command {
 } Command;
 
 // md5.c
-int md5(char *msg, char *buf);
+int md5(char *msg, char *buf, ssize_t buf_len);
 
 // sha256.c
-int sha256(char *msg, char *buf);
+int sha256(char *msg, char *buf, ssize_t buf_len);
 
 // help.c
 int help(char *msg, char *buf);

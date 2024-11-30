@@ -12,7 +12,7 @@ LIBFT = $(LIBFT_DIR)/libft.a
 LIBFT_FLAGS = -L$(LIBFT_DIR) -lft
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)/include -g
+CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)/include
 LDFLAGS = $(LIBFT_FLAGS) 
 
 all: $(LIBFT) $(NAME)
@@ -35,6 +35,12 @@ fclean: clean
 	$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean all
+
+prof:
+	make CFLAGS="${CFLAGS} -pg"
+	valgrind --tool=callgrind ./ft_ssl ${ALGO} ${TARGET}
+	callgrind_annotate callgrind.out.* > analysis.txt
+	rm callgrind.out.* gmon.out
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
