@@ -1,0 +1,70 @@
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.3145177' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 441531748
+Trigger: Program termination
+Profiled target:  ./ft_ssl md5 .out (PID 3145177, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+4,178,576,662 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                      file:function
+--------------------------------------------------------------------------------
+2,803,112,222 (67.08%)  ???:md5_hash [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+  656,538,624 (15.71%)  ???:rotl [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+  656,537,991 (15.71%)  libft/src/ft_memcpy.c:ft_memcpy [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+   54,719,778 ( 1.31%)  ./string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:__memset_avx2_unaligned_erms [/usr/lib/x86_64-linux-gnu/libc.so.6]
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: libft/src/ft_memcpy.c
+--------------------------------------------------------------------------------
+Ir                   
+
+-- line 8 ----------------------------------------
+          .           /*   Created: 2023/09/04 17:21:27 by abied-ch          #+#    #+#             */
+          .           /*   Updated: 2023/10/08 16:40:17 by abied-ch         ###   ########.fr       */
+          .           /*                                                                            */
+          .           /* ************************************************************************** */
+          .           
+          .           #include "../include/libft.h"
+          .           
+          .           void *
+          6 ( 0.00%)  ft_memcpy(void *dest, const void *src, size_t n) {
+          .               size_t i;
+          .           
+          1 ( 0.00%)      i = 0;
+          2 ( 0.00%)      if (!dest && !src) {
+          .                   return (NULL);
+          .               }
+          .           
+164,134,497 ( 3.93%)      while (i < n) {
+437,691,984 (10.47%)          ((unsigned char *)dest)[i] = ((unsigned char *)src)[i];
+ 54,711,498 ( 1.31%)          i++;
+          .               }
+          .           
+          1 ( 0.00%)      return (dest);
+          2 ( 0.00%)  }
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  ./string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S
+
+--------------------------------------------------------------------------------
+Ir                   
+--------------------------------------------------------------------------------
+656,537,991 (15.71%)  events annotated
+
