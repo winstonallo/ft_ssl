@@ -2,12 +2,12 @@
 
 // Rotates `val` to the left by `by` bits.
 u_int32_t
-rotl(u_int32_t val, const u_int32_t by) {
+rotl_32(u_int32_t val, const u_int32_t by) {
     return (val << by) | (val >> (32 - by));
 }
 
 // Rotates `val` to the right by `by` bits.
 u_int32_t
-rotr(u_int32_t val, const u_int32_t by) {
+rotr_32(u_int32_t val, const u_int32_t by) {
     return (val >> by) | (val << (32 - by));
 }
