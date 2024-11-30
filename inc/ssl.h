@@ -44,7 +44,7 @@ Command options_parse(struct Options *const args, char **argv);
 void options_cleanup(File *head);
 
 // alloc.c
-char *buf_realloc(char *old_buf, ssize_t new_size, ssize_t old_size);
+u_int8_t *buf_realloc(u_int8_t *old_buf, ssize_t new_size, ssize_t old_size);
 
 // file.c
 int file_read_all(Options *const opts);

@@ -7,30 +7,31 @@
 #include <time.h>
 #include <unistd.h>
 
-char *
+u_int8_t *
 file_read(int fd) {
     ssize_t total_size = 0;
     ssize_t allocated = BUFSIZ;
 
-    char *buf = ft_calloc(allocated, sizeof(char));
+    u_int8_t *buf = ft_calloc(allocated, sizeof(char));
     if (!buf) {
         perror("initial buffer allocation for message to digest");
         return NULL;
     }
 
     ssize_t bytes_read;
-    while ((bytes_read = read(fd, buf + total_size, allocated - (total_size + 1))) > 0) {
+    while ((bytes_read = read(fd, buf + total_size, allocated - total_size)) > 0) {
         total_size += bytes_read;
 
+        printf("buf (len %zu): %s\n", total_size, buf);
         if (total_size >= allocated) {
             allocated *= 2;
-            char *tmp = buf_realloc(buf, allocated, allocated / 2);
+            u_int8_t *tmp = buf_realloc(buf, allocated, total_size);
             if (!tmp) {
                 free(buf);
-                perror("buffer reallocation");
+                perror("buf_realloc");
                 return NULL;
             }
-            free(buf);
+            buf = tmp;
         }
     }
 
