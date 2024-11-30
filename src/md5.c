@@ -47,11 +47,6 @@ typedef struct Words {
     uint32_t D;
 } Words;
 
-typedef struct Message {
-    uint8_t *bytes;
-    size_t len;
-} Message;
-
 size_t
 md5_calculate_padding(size_t original_size) {
     if (original_size % 64 > 55) {

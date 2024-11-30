@@ -2,11 +2,12 @@
 #define SSL_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
 
-#define MALLOC_ERROR(msg)                                                                                                                                      \
+#define MALLOC_ERROR(msg)                                                                                              \
     { perror(msg); }
 
 typedef struct File {
@@ -17,6 +18,11 @@ typedef struct File {
     bool reallocated;
     struct File *next;
 } File;
+
+typedef struct Message {
+    uint8_t *bytes;
+    size_t len;
+} Message;
 
 typedef struct Options {
     bool p;
