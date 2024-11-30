@@ -3,6 +3,7 @@
 #include "ssl.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 #define MD5_BLOCK_SIZE 64 // 512 bits
 
@@ -53,10 +54,9 @@ md5_calculate_padding(size_t original_size) {
 }
 
 Message
-md5_pad(char *buf) {
+md5_pad(char *buf, ssize_t buf_len) {
     Message msg = {0};
 
-    uint64_t buf_len = ft_strlen(buf);
     uint64_t padding_size = md5_calculate_padding(buf_len);
 
     uint64_t new_size = buf_len + padding_size + 1 + 8;
@@ -108,8 +108,8 @@ md5_store_to_buf(char *buf, Words words) {
 }
 
 static int
-md5_hash(char *buf, Words *words) {
-    Message msg = md5_pad(buf);
+md5_hash(char *buf, Words *words, ssize_t buf_len) {
+    Message msg = md5_pad(buf, buf_len);
     if (!msg.bytes) {
         return -1;
     }
@@ -176,10 +176,10 @@ md5_hash(char *buf, Words *words) {
 // be used for anything else than educational purposes.
 // https://en.wikipedia.org/wiki/MD5
 int
-md5(char *msg, char *buf) {
+md5(char *msg, char *buf, ssize_t buf_len) {
     Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D};
 
-    if (md5_hash(msg, &words) == -1) {
+    if (md5_hash(msg, &words, buf_len) == -1) {
         return -1;
     }
 
