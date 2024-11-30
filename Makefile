@@ -42,6 +42,9 @@ prof:
 	callgrind_annotate callgrind.out.* > ${OUTFILE}
 	rm callgrind.out.* gmon.out
 
+debug:
+	make CFLAGS="${CFLAGS} -g"
+
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
 

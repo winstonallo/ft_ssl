@@ -54,25 +54,29 @@ md5_calculate_padding(size_t original_size) {
 }
 
 Message
-md5_pad(char *buf, ssize_t buf_len) {
-    Message msg = {0};
+md5_pad(File *msg) {
+    Message buf = {0};
 
-    uint64_t padding_size = md5_calculate_padding(buf_len);
+    uint64_t padding_size = md5_calculate_padding(msg->content_size);
 
-    uint64_t new_size = buf_len + padding_size + 1 + 8;
+    ssize_t new_size = msg->content_size + padding_size + 1 + 8;
 
-    msg.bytes = ft_calloc(new_size, sizeof(char));
-    if (!msg.bytes) {
-        return msg;
+    if (new_size >= msg->allocated_bytes) {
+        buf.bytes = malloc(new_size * sizeof(char));
+        if (!buf.bytes) {
+            return buf;
+        }
+    } else {
+        buf.bytes = (uint8_t *)msg->content;
     }
 
-    ft_memcpy(msg.bytes, buf, buf_len);
-    msg.bytes[buf_len] = (char)0x80;
-    *(uint64_t *)(&msg.bytes[new_size - 8]) = buf_len * 8;
+    ft_memcpy(buf.bytes, msg->content, msg->content_size);
+    buf.bytes[msg->content_size] = (char)0x80;
+    *(uint64_t *)(&buf.bytes[new_size - 8]) = msg->content_size * 8;
 
-    msg.len = new_size;
+    buf.len = new_size;
 
-    return msg;
+    return buf;
 }
 
 static void
@@ -108,9 +112,9 @@ md5_store_to_buf(char *buf, Words words) {
 }
 
 static int
-md5_hash(char *buf, Words *words, ssize_t buf_len) {
-    Message msg = md5_pad(buf, buf_len);
-    if (!msg.bytes) {
+md5_hash(File *msg, Words *words) {
+    Message buf = md5_pad(msg);
+    if (!buf.bytes) {
         return -1;
     }
 
@@ -119,7 +123,7 @@ md5_hash(char *buf, Words *words, ssize_t buf_len) {
     uint32_t c0 = DFLT_C;
     uint32_t d0 = DFLT_D;
 
-    for (uint8_t *chunk = msg.bytes; (size_t)chunk - (size_t)msg.bytes < msg.len; chunk += MD5_BLOCK_SIZE) {
+    for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += MD5_BLOCK_SIZE) {
 
         uint32_t *block = (void *)chunk;
         uint32_t A = a0;
@@ -163,7 +167,7 @@ md5_hash(char *buf, Words *words, ssize_t buf_len) {
     words->C = c0;
     words->D = d0;
 
-    free(msg.bytes);
+    free(buf.bytes);
     return 0;
 }
 
@@ -176,10 +180,10 @@ md5_hash(char *buf, Words *words, ssize_t buf_len) {
 // be used for anything else than educational purposes.
 // https://en.wikipedia.org/wiki/MD5
 int
-md5(char *msg, char *buf, ssize_t buf_len) {
+md5(File *msg, char *buf) {
     Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D};
 
-    if (md5_hash(msg, &words, buf_len) == -1) {
+    if (md5_hash(msg, &words) == -1) {
         return -1;
     }
 
