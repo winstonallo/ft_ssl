@@ -1,4 +1,4 @@
 # BUILD
 obj/
 ft_ssl
-libft/libft.a
+libft/libft.aout

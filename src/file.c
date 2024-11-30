@@ -19,17 +19,18 @@ file_read(int fd) {
     }
 
     ssize_t bytes_read;
-    while ((bytes_read = read(fd, buf + total_size, allocated - total_size)) > 0) {
+    while ((bytes_read = read(fd, buf + total_size, allocated - (total_size + 1))) > 0) {
         total_size += bytes_read;
 
         if (total_size >= allocated) {
             allocated *= 2;
-            char *tmp = buf_realloc(buf, allocated);
+            char *tmp = buf_realloc(buf, allocated, allocated / 2);
             if (!tmp) {
                 free(buf);
                 perror("buffer reallocation");
                 return NULL;
             }
+            free(buf);
         }
     }
 
