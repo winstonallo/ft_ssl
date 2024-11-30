@@ -18,16 +18,17 @@ ft_calloc(size_t nmemb, size_t size) {
     void *dest;
 
     dest = NULL;
-    if (nmemb == 0 || size == 0)
+    if (nmemb == 0 || size == 0) {
         return (malloc(0));
-    if ((size * nmemb) / nmemb != size)
+    }
+    if ((size * nmemb) / nmemb != size) {
         return (NULL);
+    }
     dest = malloc(nmemb * size);
-    if (dest == NULL)
+    if (!dest) {
         return (NULL);
-    if (dest)
-        ft_bzero(dest, size * nmemb);
+    }
+
+    ft_bzero(dest, size * nmemb);
     return (dest);
 }
-
-
