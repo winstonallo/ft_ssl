@@ -151,17 +151,28 @@ md5_hash(File *msg, Words *words) {
 
             if (step < 16) {
                 F = (B & C) | ((~B) & D);
-                // g = step
             } else if (step < 32) {
                 F = (D & B) | ((~D) & C);
-                // g = (5 * step + 1) % 16
             } else if (step < 48) {
                 F = B ^ C ^ D;
-                // g = (3 * step + 5) % 16
             } else {
                 F = C ^ (B | (~D));
-                // g = (7 * step) % 16
             }
+
+            // switch (step / 16) {
+            // case 0:
+            //     F = (B & C) | ((~B) & D);
+            //     break;
+            // case 1:
+            //     F = (D & B) | ((~D) & C);
+            //     break;
+            // case 2:
+            //     F = B ^ C ^ D;
+            //     break;
+            // case 3:
+            //     F = C ^ (B | (~D));
+            //     break;
+            // }
 
             g = block_idx[step];
 
