@@ -4,3 +4,4 @@ ft_ssl
 libft/libft.aout
 *.out
 *.txt
+libft.a
