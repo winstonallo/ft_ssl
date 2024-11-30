@@ -14,6 +14,7 @@ typedef struct File {
     void *content;
     ssize_t content_size;
     ssize_t allocated_bytes;
+    bool reallocated;
     struct File *next;
 } File;
 
@@ -33,10 +34,10 @@ typedef enum Command {
 } Command;
 
 // md5.c
-int md5(File* msg, char *buf);
+int md5(File *msg, char *buf);
 
 // sha256.c
-int sha256(File* msg, char *buf);
+int sha256(File *msg, char *buf);
 
 // help.c
 int help(char *msg, char *buf);

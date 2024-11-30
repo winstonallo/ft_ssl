@@ -21,7 +21,6 @@ file_read(int fd, File *file) {
     while ((bytes_read = read(fd, file->content + total_size, file->allocated_bytes - total_size)) > 0) {
         total_size += bytes_read;
 
-        // printf("buf (len %zu)\n", total_size);
         if (total_size >= file->allocated_bytes) {
             file->allocated_bytes *= 2;
             u_int8_t *tmp = buf_realloc(file->content, file->allocated_bytes, total_size);
@@ -38,7 +37,16 @@ file_read(int fd, File *file) {
         perror("reading message to digest");
         return -1;
     }
+
+    // This is a monkey patch, since optimizing `buf_realloc` to use `malloc` instead of `ft_calloc`,
+    // there has been some uninitialized value issue when constructing the hash output (not influencing
+    // the functionality, but better be safe).
+    // It ensures that the next 512 bytes after the total size of the message are initialized. I do not
+    // go back to `ft_calloc` because removing it resulted in a ~25% speed increase.
+    ft_memset(file->content + total_size, 0, 512);
+
     file->content_size = total_size;
+
     return 0;
 }
 

@@ -62,6 +62,7 @@ md5_pad(File *msg) {
     ssize_t new_size = msg->content_size + padding_size + 1 + 8;
 
     if (new_size >= msg->allocated_bytes) {
+        msg->reallocated = true;
         buf.bytes = malloc(new_size * sizeof(char));
         if (!buf.bytes) {
             return buf;
@@ -71,6 +72,10 @@ md5_pad(File *msg) {
     }
 
     ft_memcpy(buf.bytes, msg->content, msg->content_size);
+    if (msg->reallocated) {
+        free(msg->content);
+    }
+
     buf.bytes[msg->content_size] = (char)0x80;
     *(uint64_t *)(&buf.bytes[new_size - 8]) = msg->content_size * 8;
 
@@ -126,6 +131,7 @@ md5_hash(File *msg, Words *words) {
     for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += MD5_BLOCK_SIZE) {
 
         uint32_t *block = (void *)chunk;
+
         uint32_t A = a0;
         uint32_t B = b0;
         uint32_t C = c0;

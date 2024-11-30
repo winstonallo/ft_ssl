@@ -67,6 +67,10 @@ file_new(const char *const path) {
 
     file->path = path;
     file->next = NULL;
+    file->allocated_bytes = 0;
+    file->content_size = 0;
+    file->reallocated = false;
+    file->content = NULL;
 
     return file;
 }
