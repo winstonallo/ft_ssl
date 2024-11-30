@@ -131,38 +131,19 @@ md5_hash(char *buf, Words *words) {
             uint32_t F;
             uint32_t g;
 
-            switch (step / 16) {
-            case 0:
+            if (step < 16) {
                 F = (B & C) | ((~B) & D);
                 g = step;
-                break;
-            case 1:
+            } else if (step < 32) {
                 F = (D & B) | ((~D) & C);
                 g = (5 * step + 1) % 16;
-                break;
-            case 2:
+            } else if (step < 48) {
                 F = B ^ C ^ D;
                 g = (3 * step + 5) % 16;
-                break;
-            case 3:
+            } else {
                 F = C ^ (B | (~D));
                 g = (7 * step) % 16;
-                break;
             }
-
-            // if (step < 16) {
-            //     F = (B & C) | ((~B) & D);
-            //     g = step;
-            // } else if (step < 32) {
-            //     F = (D & B) | ((~D) & C);
-            //     g = (5 * step + 1) % 16;
-            // } else if (step < 48) {
-            //     F = B ^ C ^ D;
-            //     g = (3 * step + 5) % 16;
-            // } else {
-            //     F = C ^ (B | (~D));
-            //     g = (7 * step) % 16;
-            // }
 
             F = F + A + K[step] + block[g];
             A = D;
