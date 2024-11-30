@@ -141,7 +141,6 @@ options_cleanup(File *head) {
     File *prev;
 
     while (head) {
-        free(head->content);
         prev = head;
         head = head->next;
         free(prev);

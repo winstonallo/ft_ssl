@@ -9,22 +9,22 @@
 int
 file_read(int fd, File *file) {
     ssize_t total_size = 0;
-    ssize_t allocated = BUFSIZ;
+    file->allocated_bytes = BUFSIZ;
 
-    file->content = ft_calloc(allocated, sizeof(char));
+    file->content = ft_calloc(file->allocated_bytes, sizeof(char));
     if (!file->content) {
         perror("initial buffer allocation for message to digest");
         return -1;
     }
 
     ssize_t bytes_read;
-    while ((bytes_read = read(fd, file->content + total_size, allocated - total_size)) > 0) {
+    while ((bytes_read = read(fd, file->content + total_size, file->allocated_bytes - total_size)) > 0) {
         total_size += bytes_read;
 
         // printf("buf (len %zu)\n", total_size);
-        if (total_size >= allocated) {
-            allocated *= 2;
-            u_int8_t *tmp = buf_realloc(file->content, allocated, total_size);
+        if (total_size >= file->allocated_bytes) {
+            file->allocated_bytes *= 2;
+            u_int8_t *tmp = buf_realloc(file->content, file->allocated_bytes, total_size);
             if (!tmp) {
                 free(file->content);
                 perror("buf_realloc");

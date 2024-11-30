@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-typedef int (*Algo)(char *, char *, ssize_t);
+typedef int (*Algo)(File *, char *);
 
 static const Algo algo_map[] = {
     md5,    // CMD_MD5
@@ -43,7 +43,7 @@ main(int ac, char **av) {
 
     for (File *it = opts.targets; it; it = it->next) {
         char buf[algo_buffer_sizes[cmd]];
-        algo_map[cmd](it->content, buf, it->content_size);
+        algo_map[cmd](it, buf);
         display(buf, (char *)algo_names[cmd], (char *)it->path, &opts);
     }
 
