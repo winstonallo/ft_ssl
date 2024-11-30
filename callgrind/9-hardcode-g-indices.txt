@@ -1,0 +1,683 @@
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.3429297' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 933967368
+Trigger: Program termination
+Profiled target:  ./ft_ssl md5 .out (PID 3429297, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+5,915,709,961 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                      file:function
+--------------------------------------------------------------------------------
+2,789,434,332 (47.15%)  ???:md5_hash [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+1,422,502,332 (24.05%)  ./gmon/./gmon/mcount.c:__mcount_internal [/usr/lib/x86_64-linux-gnu/libc.so.6]
+1,148,944,062 (19.42%)  ./gmon/../sysdeps/x86_64/_mcount.S:mcount [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  492,403,968 ( 8.32%)  src/bit/rotate.c:rotl [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+   54,711,517 ( 0.92%)  ???:ft_memcpy [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: src/bit/rotate.c
+--------------------------------------------------------------------------------
+Ir                   
+
+          .           #include <sys/types.h>
+          .           
+          .           // Rotates `val` to the left by `by` bits.
+          .           u_int32_t
+218,846,208 ( 3.70%)  rotl(u_int32_t val, const u_int32_t by) {
+2,571,442,948 (43.47%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (54,711,552x)
+164,134,656 ( 2.77%)      return (val << by) | (val >> (32 - by));
+109,423,104 ( 1.85%)  }
+          .           
+          .           // Rotates `val` to the right by `by` bits.
+          .           u_int32_t
+          .           rotr(u_int32_t val, const u_int32_t by) {
+          .               return (val >> by) | (val << (32 - by));
+          .           }
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  ./gmon/../sysdeps/x86_64/_mcount.S
+  ./gmon/./gmon/mcount.c
+
+--------------------------------------------------------------------------------
+Ir                   
+--------------------------------------------------------------------------------
+492,403,968 ( 8.32%)  events annotated
+
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.3431862' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 933969240
+Trigger: Program termination
+Profiled target:  ./ft_ssl md5 .out (PID 3431862, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+6,189,271,439 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                      file:function
+--------------------------------------------------------------------------------
+2,789,434,332 (45.07%)  ???:md5_hash [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+1,422,502,444 (22.98%)  ./gmon/./gmon/mcount.c:__mcount_internal [/usr/lib/x86_64-linux-gnu/libc.so.6]
+1,148,944,146 (18.56%)  ./gmon/../sysdeps/x86_64/_mcount.S:mcount [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  765,961,728 (12.38%)  ???:rotl [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+   54,711,517 ( 0.88%)  ???:ft_memcpy [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  ./gmon/../sysdeps/x86_64/_mcount.S
+  ./gmon/./gmon/mcount.c
+
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.3433802' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 933969228
+Trigger: Program termination
+Profiled target:  ./ft_ssl md5 .out (PID 3433802, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+6,189,271,439 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                      file:function
+--------------------------------------------------------------------------------
+2,789,434,332 (45.07%)  src/md5.c:md5_hash [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+1,422,502,444 (22.98%)  ./gmon/./gmon/mcount.c:__mcount_internal [/usr/lib/x86_64-linux-gnu/libc.so.6]
+1,148,944,146 (18.56%)  ./gmon/../sysdeps/x86_64/_mcount.S:mcount [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  765,961,728 (12.38%)  src/bit/rotate.c:rotl [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+   54,711,517 ( 0.88%)  libft/src/ft_memcpy.c:ft_memcpy [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: libft/src/ft_memcpy.c
+--------------------------------------------------------------------------------
+Ir                  
+
+-- line 8 ----------------------------------------
+         .           /*   Created: 2023/09/04 17:21:27 by abied-ch          #+#    #+#             */
+         .           /*   Updated: 2023/10/08 16:40:17 by abied-ch         ###   ########.fr       */
+         .           /*                                                                            */
+         .           /* ************************************************************************** */
+         .           
+         .           #include "../include/libft.h"
+         .           
+         .           void *
+         8 ( 0.00%)  ft_memcpy(void *dest, const void *src, size_t n) {
+        51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+         2 ( 0.00%)      if (!dest && !src) {
+         .                   return (NULL);
+         .               }
+         .           
+         .           #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__)
+54,711,504 ( 0.88%)      __asm__ __volatile__("rep movsb" : : "S"(src), "D"(dest), "c"(n) : "memory");
+         .           #else
+         .               size_t i = 0;
+         .           
+         .               while (i < n) {
+         .                   ((unsigned char *)dest)[i] = ((unsigned char *)src)[i];
+         .                   i++;
+         .               }
+         .           #endif
+         .           
+         1 ( 0.00%)      return dest;
+         2 ( 0.00%)  }
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: src/md5.c
+--------------------------------------------------------------------------------
+Ir                   
+
+-- line 43 ----------------------------------------
+          .           } Words;
+          .           
+          .           typedef struct Message {
+          .               uint8_t *bytes;
+          .               size_t len;
+          .           } Message;
+          .           
+          .           size_t
+          6 ( 0.00%)  md5_calculate_padding(size_t original_size) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          4 ( 0.00%)      if (original_size % 64 > 55) {
+          .                   return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) + 56;
+          .               } else {
+          4 ( 0.00%)          return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) - 8;
+          .               }
+          2 ( 0.00%)  }
+          .           
+          .           Message
+          6 ( 0.00%)  md5_pad(File *msg) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          2 ( 0.00%)      Message buf = {0};
+          .           
+          5 ( 0.00%)      uint64_t padding_size = md5_calculate_padding(msg->content_size);
+         67 ( 0.00%)  => src/md5.c:md5_calculate_padding (1x)
+          .           
+          7 ( 0.00%)      ssize_t new_size = msg->content_size + padding_size + 1 + 8;
+          .           
+          4 ( 0.00%)      if (new_size >= msg->allocated_bytes) {
+          .                   msg->reallocated = true;
+          .                   buf.bytes = malloc(new_size * sizeof(char));
+          .                   if (!buf.bytes) {
+          .                       return buf;
+          .                   }
+          .               } else {
+          3 ( 0.00%)          buf.bytes = (uint8_t *)msg->content;
+          .               }
+          .           
+          9 ( 0.00%)      ft_memcpy(buf.bytes, msg->content, msg->content_size);
+ 54,711,568 ( 0.88%)  => /home/winstonallo/mastery/ft_ssl/libft/src/ft_memcpy.c:ft_memcpy (1x)
+          4 ( 0.00%)      if (msg->reallocated) {
+          .                   free(msg->content);
+          .               }
+          .           
+          5 ( 0.00%)      buf.bytes[msg->content_size] = (char)0x80;
+          9 ( 0.00%)      *(uint64_t *)(&buf.bytes[new_size - 8]) = msg->content_size * 8;
+          .           
+          2 ( 0.00%)      buf.len = new_size;
+          .           
+          2 ( 0.00%)      return buf;
+          2 ( 0.00%)  }
+          .           
+          .           static void
+         15 ( 0.00%)  md5_store_to_buf(char *buf, Words words) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          2 ( 0.00%)      uint32_t A = words.A;
+          2 ( 0.00%)      uint32_t B = words.B;
+          2 ( 0.00%)      uint32_t C = words.C;
+          2 ( 0.00%)      uint32_t D = words.D;
+          .           
+          1 ( 0.00%)      int idx = 0;
+          .           
+          7 ( 0.00%)      byte_to_hex(A & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((A >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((A >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((A >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          7 ( 0.00%)      byte_to_hex(B & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((B >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((B >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((B >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          7 ( 0.00%)      byte_to_hex(C & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((C >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((C >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((C >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          7 ( 0.00%)      byte_to_hex(D & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((D >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((D >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((D >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          5 ( 0.00%)      buf[idx] = '\0';
+          6 ( 0.00%)  }
+          .           
+          .           static int
+          7 ( 0.00%)  md5_hash(File *msg, Words *words) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          5 ( 0.00%)      Message buf = md5_pad(msg);
+ 54,711,746 ( 0.88%)  => src/md5.c:md5_pad (1x)
+          3 ( 0.00%)      if (!buf.bytes) {
+          .                   return -1;
+          .               }
+          .           
+          1 ( 0.00%)      uint32_t a0 = DFLT_A;
+          1 ( 0.00%)      uint32_t b0 = DFLT_B;
+          1 ( 0.00%)      uint32_t c0 = DFLT_C;
+          1 ( 0.00%)      uint32_t d0 = DFLT_D;
+          .           
+  7,693,823 ( 0.12%)      for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += MD5_BLOCK_SIZE) {
+          .           
+  1,709,736 ( 0.03%)          uint32_t *block = (void *)chunk;
+          .           
+  1,709,736 ( 0.03%)          uint32_t A = a0;
+  1,709,736 ( 0.03%)          uint32_t B = b0;
+  1,709,736 ( 0.03%)          uint32_t C = c0;
+  1,709,736 ( 0.03%)          uint32_t D = d0;
+          .           
+167,554,128 ( 2.71%)          for (size_t step = 0; step < 64; ++step) {
+          .                       uint32_t F;
+          .                       uint32_t g;
+          .           
+109,423,104 ( 1.77%)              if (step < 16) {
+123,100,992 ( 1.99%)                  F = (B & C) | ((~B) & D);
+          .                           // g = block_idx[step]; // g = step
+ 82,067,328 ( 1.33%)              } else if (step < 32) {
+123,100,992 ( 1.99%)                  F = (D & B) | ((~D) & C);
+          .                           // g = block_idx[step]; // g = (5 * step + 1) % 16
+ 54,711,552 ( 0.88%)              } else if (step < 48) {
+ 68,389,440 ( 1.10%)                  F = B ^ C ^ D;
+          .                           // g = block_idx[step]; // g = (3 * step + 5) % 16
+          .                       } else {
+ 68,389,440 ( 1.10%)                  F = C ^ (B | (~D));
+          .                           // g = block_idx[step]; // (7 * step) % 16
+          .                       }
+          .           
+328,269,312 ( 5.30%)              g = block_idx[step];
+          .           
+820,673,280 (13.26%)              F = F + A + K[step] + block[g];
+109,423,104 ( 1.77%)              A = D;
+109,423,104 ( 1.77%)              D = C;
+109,423,104 ( 1.77%)              C = B;
+492,403,968 ( 7.96%)              B += rotl(F, s[step]);
+3,337,404,676 (53.92%)  => /home/winstonallo/mastery/ft_ssl/src/bit/rotate.c:rotl (54,711,552x)
+          .                   }
+          .           
+  1,709,736 ( 0.03%)          a0 += A;
+  1,709,736 ( 0.03%)          b0 += B;
+  1,709,736 ( 0.03%)          c0 += C;
+  1,709,736 ( 0.03%)          d0 += D;
+          .               }
+          .           
+          3 ( 0.00%)      words->A = a0;
+          3 ( 0.00%)      words->B = b0;
+          3 ( 0.00%)      words->C = c0;
+          3 ( 0.00%)      words->D = d0;
+          .           
+          3 ( 0.00%)      free(buf.bytes);
+         69 ( 0.00%)  => ???:0x00000000001090f0 (1x)
+          1 ( 0.00%)      return 0;
+          2 ( 0.00%)  }
+          .           
+          .           // Memory Safety:
+          .           // `buf` is assumed to be a buffer capable of holding `33 bytes` (the size of
+          .           // the MD5 hash function's output + `\0`). Failure to ensure this will lead to
+          .           // memory corruption.
+          .           // Cryptographic Safety:
+          .           // - The MD5 hash algorithm is not collision-resistant. This should not
+          .           // be used for anything else than educational purposes.
+          .           // https://en.wikipedia.org/wiki/MD5
+          .           int
+         10 ( 0.00%)  md5(File *msg, char *buf) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          4 ( 0.00%)      Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D};
+          .           
+          7 ( 0.00%)      if (md5_hash(msg, &words) == -1) {
+6,181,550,874 (99.88%)  => src/md5.c:md5_hash (1x)
+          .                   return -1;
+          .               }
+          .           
+          6 ( 0.00%)      md5_store_to_buf(buf, words);
+      1,730 ( 0.00%)  => src/md5.c:md5_store_to_buf (1x)
+          1 ( 0.00%)      return 0;
+          5 ( 0.00%)  }
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: src/bit/rotate.c
+--------------------------------------------------------------------------------
+Ir                   
+
+          .           #include <sys/types.h>
+          .           
+          .           // Rotates `val` to the left by `by` bits.
+          .           u_int32_t
+382,980,864 ( 6.19%)  rotl(u_int32_t val, const u_int32_t by) {
+2,571,442,948 (41.55%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (54,711,552x)
+273,557,760 ( 4.42%)      return (val << by) | (val >> (32 - by));
+109,423,104 ( 1.77%)  }
+          .           
+          .           // Rotates `val` to the right by `by` bits.
+          .           u_int32_t
+          .           rotr(u_int32_t val, const u_int32_t by) {
+          .               return (val >> by) | (val << (32 - by));
+          .           }
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  ./gmon/../sysdeps/x86_64/_mcount.S
+  ./gmon/./gmon/mcount.c
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+3,610,107,845 (58.33%)  events annotated
+
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.3437409' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 933969164
+Trigger: Program termination
+Profiled target:  ./ft_ssl md5 .out (PID 3437409, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+6,189,271,438 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                      file:function
+--------------------------------------------------------------------------------
+2,789,434,332 (45.07%)  src/md5.c:md5_hash [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+1,422,502,444 (22.98%)  ./gmon/./gmon/mcount.c:__mcount_internal [/usr/lib/x86_64-linux-gnu/libc.so.6]
+1,148,944,146 (18.56%)  ./gmon/../sysdeps/x86_64/_mcount.S:mcount [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  765,961,728 (12.38%)  src/bit/rotate.c:rotl [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+   54,711,517 ( 0.88%)  libft/src/ft_memcpy.c:ft_memcpy [/home/winstonallo/mastery/ft_ssl/ft_ssl]
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: src/md5.c
+--------------------------------------------------------------------------------
+Ir                   
+
+-- line 43 ----------------------------------------
+          .           } Words;
+          .           
+          .           typedef struct Message {
+          .               uint8_t *bytes;
+          .               size_t len;
+          .           } Message;
+          .           
+          .           size_t
+          6 ( 0.00%)  md5_calculate_padding(size_t original_size) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          4 ( 0.00%)      if (original_size % 64 > 55) {
+          .                   return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) + 56;
+          .               } else {
+          4 ( 0.00%)          return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) - 8;
+          .               }
+          2 ( 0.00%)  }
+          .           
+          .           Message
+          6 ( 0.00%)  md5_pad(File *msg) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          2 ( 0.00%)      Message buf = {0};
+          .           
+          5 ( 0.00%)      uint64_t padding_size = md5_calculate_padding(msg->content_size);
+         67 ( 0.00%)  => src/md5.c:md5_calculate_padding (1x)
+          .           
+          7 ( 0.00%)      ssize_t new_size = msg->content_size + padding_size + 1 + 8;
+          .           
+          4 ( 0.00%)      if (new_size >= msg->allocated_bytes) {
+          .                   msg->reallocated = true;
+          .                   buf.bytes = malloc(new_size * sizeof(char));
+          .                   if (!buf.bytes) {
+          .                       return buf;
+          .                   }
+          .               } else {
+          3 ( 0.00%)          buf.bytes = (uint8_t *)msg->content;
+          .               }
+          .           
+          9 ( 0.00%)      ft_memcpy(buf.bytes, msg->content, msg->content_size);
+ 54,711,568 ( 0.88%)  => /home/winstonallo/mastery/ft_ssl/libft/src/ft_memcpy.c:ft_memcpy (1x)
+          4 ( 0.00%)      if (msg->reallocated) {
+          .                   free(msg->content);
+          .               }
+          .           
+          5 ( 0.00%)      buf.bytes[msg->content_size] = (char)0x80;
+          9 ( 0.00%)      *(uint64_t *)(&buf.bytes[new_size - 8]) = msg->content_size * 8;
+          .           
+          2 ( 0.00%)      buf.len = new_size;
+          .           
+          2 ( 0.00%)      return buf;
+          2 ( 0.00%)  }
+          .           
+          .           static void
+         15 ( 0.00%)  md5_store_to_buf(char *buf, Words words) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          2 ( 0.00%)      uint32_t A = words.A;
+          2 ( 0.00%)      uint32_t B = words.B;
+          2 ( 0.00%)      uint32_t C = words.C;
+          2 ( 0.00%)      uint32_t D = words.D;
+          .           
+          1 ( 0.00%)      int idx = 0;
+          .           
+          7 ( 0.00%)      byte_to_hex(A & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((A >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((A >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((A >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          7 ( 0.00%)      byte_to_hex(B & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((B >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((B >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((B >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          7 ( 0.00%)      byte_to_hex(C & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((C >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((C >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((C >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          7 ( 0.00%)      byte_to_hex(D & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((D >> 8) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((D >> 16) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          8 ( 0.00%)      byte_to_hex((D >> 24) & 0xFF, buf, &idx);
+         95 ( 0.00%)  => /home/winstonallo/mastery/ft_ssl/src/hex.c:byte_to_hex (1x)
+          .           
+          5 ( 0.00%)      buf[idx] = '\0';
+          6 ( 0.00%)  }
+          .           
+          .           static int
+          7 ( 0.00%)  md5_hash(File *msg, Words *words) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          5 ( 0.00%)      Message buf = md5_pad(msg);
+ 54,711,746 ( 0.88%)  => src/md5.c:md5_pad (1x)
+          3 ( 0.00%)      if (!buf.bytes) {
+          .                   return -1;
+          .               }
+          .           
+          1 ( 0.00%)      uint32_t a0 = DFLT_A;
+          1 ( 0.00%)      uint32_t b0 = DFLT_B;
+          1 ( 0.00%)      uint32_t c0 = DFLT_C;
+          1 ( 0.00%)      uint32_t d0 = DFLT_D;
+          .           
+  7,693,823 ( 0.12%)      for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += MD5_BLOCK_SIZE) {
+          .           
+  1,709,736 ( 0.03%)          uint32_t *block = (void *)chunk;
+          .           
+  1,709,736 ( 0.03%)          uint32_t A = a0;
+  1,709,736 ( 0.03%)          uint32_t B = b0;
+  1,709,736 ( 0.03%)          uint32_t C = c0;
+  1,709,736 ( 0.03%)          uint32_t D = d0;
+          .           
+167,554,128 ( 2.71%)          for (size_t step = 0; step < 64; ++step) {
+          .                       uint32_t F;
+          .                       uint32_t g;
+          .           
+109,423,104 ( 1.77%)              if (step < 16) {
+123,100,992 ( 1.99%)                  F = (B & C) | ((~B) & D);
+          .                           // g = block_idx[step]; // g = step
+ 82,067,328 ( 1.33%)              } else if (step < 32) {
+123,100,992 ( 1.99%)                  F = (D & B) | ((~D) & C);
+          .                           // g = block_idx[step]; // g = (5 * step + 1) % 16
+ 54,711,552 ( 0.88%)              } else if (step < 48) {
+ 68,389,440 ( 1.10%)                  F = B ^ C ^ D;
+          .                           // g = block_idx[step]; // g = (3 * step + 5) % 16
+          .                       } else {
+ 68,389,440 ( 1.10%)                  F = C ^ (B | (~D));
+          .                           // g = block_idx[step]; // (7 * step) % 16
+          .                       }
+          .           
+328,269,312 ( 5.30%)              g = block_idx[step];
+          .           
+820,673,280 (13.26%)              F = F + A + K[step] + block[g];
+109,423,104 ( 1.77%)              A = D;
+109,423,104 ( 1.77%)              D = C;
+109,423,104 ( 1.77%)              C = B;
+492,403,968 ( 7.96%)              B += rotl(F, s[step]);
+3,337,404,676 (53.92%)  => /home/winstonallo/mastery/ft_ssl/src/bit/rotate.c:rotl (54,711,552x)
+          .                   }
+          .           
+  1,709,736 ( 0.03%)          a0 += A;
+  1,709,736 ( 0.03%)          b0 += B;
+  1,709,736 ( 0.03%)          c0 += C;
+  1,709,736 ( 0.03%)          d0 += D;
+          .               }
+          .           
+          3 ( 0.00%)      words->A = a0;
+          3 ( 0.00%)      words->B = b0;
+          3 ( 0.00%)      words->C = c0;
+          3 ( 0.00%)      words->D = d0;
+          .           
+          3 ( 0.00%)      free(buf.bytes);
+         69 ( 0.00%)  => ???:0x00000000001090f0 (1x)
+          1 ( 0.00%)      return 0;
+          2 ( 0.00%)  }
+          .           
+          .           // Memory Safety:
+          .           // `buf` is assumed to be a buffer capable of holding `33 bytes` (the size of
+          .           // the MD5 hash function's output + `\0`). Failure to ensure this will lead to
+          .           // memory corruption.
+          .           // Cryptographic Safety:
+          .           // - The MD5 hash algorithm is not collision-resistant. This should not
+          .           // be used for anything else than educational purposes.
+          .           // https://en.wikipedia.org/wiki/MD5
+          .           int
+         10 ( 0.00%)  md5(File *msg, char *buf) {
+         51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+          4 ( 0.00%)      Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D};
+          .           
+          7 ( 0.00%)      if (md5_hash(msg, &words) == -1) {
+6,181,550,874 (99.88%)  => src/md5.c:md5_hash (1x)
+          .                   return -1;
+          .               }
+          .           
+          6 ( 0.00%)      md5_store_to_buf(buf, words);
+      1,730 ( 0.00%)  => src/md5.c:md5_store_to_buf (1x)
+          1 ( 0.00%)      return 0;
+          5 ( 0.00%)  }
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: src/bit/rotate.c
+--------------------------------------------------------------------------------
+Ir                   
+
+          .           #include <sys/types.h>
+          .           
+          .           // Rotates `val` to the left by `by` bits.
+          .           u_int32_t
+382,980,864 ( 6.19%)  rotl(u_int32_t val, const u_int32_t by) {
+2,571,442,948 (41.55%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (54,711,552x)
+273,557,760 ( 4.42%)      return (val << by) | (val >> (32 - by));
+109,423,104 ( 1.77%)  }
+          .           
+          .           // Rotates `val` to the right by `by` bits.
+          .           u_int32_t
+          .           rotr(u_int32_t val, const u_int32_t by) {
+          .               return (val >> by) | (val << (32 - by));
+          .           }
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: libft/src/ft_memcpy.c
+--------------------------------------------------------------------------------
+Ir                  
+
+-- line 8 ----------------------------------------
+         .           /*   Created: 2023/09/04 17:21:27 by abied-ch          #+#    #+#             */
+         .           /*   Updated: 2023/10/08 16:40:17 by abied-ch         ###   ########.fr       */
+         .           /*                                                                            */
+         .           /* ************************************************************************** */
+         .           
+         .           #include "../include/libft.h"
+         .           
+         .           void *
+         8 ( 0.00%)  ft_memcpy(void *dest, const void *src, size_t n) {
+        51 ( 0.00%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (1x)
+         2 ( 0.00%)      if (!dest && !src) {
+         .                   return (NULL);
+         .               }
+         .           
+         .           #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__)
+54,711,504 ( 0.88%)      __asm__ __volatile__("rep movsb" : : "S"(src), "D"(dest), "c"(n) : "memory");
+         .           #else
+         .               size_t i = 0;
+         .           
+         .               while (i < n) {
+         .                   ((unsigned char *)dest)[i] = ((unsigned char *)src)[i];
+         .                   i++;
+         .               }
+         .           #endif
+         .           
+         1 ( 0.00%)      return dest;
+         2 ( 0.00%)  }
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  ./gmon/../sysdeps/x86_64/_mcount.S
+  ./gmon/./gmon/mcount.c
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+3,610,107,845 (58.33%)  events annotated
+
