@@ -5,7 +5,7 @@ SRC_DIR = src
 INC_DIR = inc
 LIBFT_DIR = libft
 
-SRCS = ssl.c md5.c sha256.c options.c file.c help.c alloc.c hex.c display.c
+SRCS = ssl.c md5.c sha256.c options.c file.c help.c alloc.c hex.c display.c bit/rotate.c
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 
 LIBFT = $(LIBFT_DIR)/libft.a
@@ -24,7 +24,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_DIR)/ssl.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)/bit
 
 clean:
 	rm -rf $(OBJ_DIR)

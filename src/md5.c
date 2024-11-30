@@ -1,3 +1,4 @@
+#include "bit.h"
 #include "libft.h"
 #include "ssl.h"
 #include <stdint.h>
@@ -6,7 +7,6 @@
 #define MD5_BLOCK_SIZE 64 // 512 bits
 
 // Rotates `x` to the left by `n` bits
-#define ROTL(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
 #define DFLT_A 0x67452301
 #define DFLT_B 0xefcdab89
@@ -131,25 +131,44 @@ md5_hash(char *buf, Words *words) {
             uint32_t F;
             uint32_t g;
 
-            if (step < 16) {
+            switch (step / 16) {
+            case 0:
                 F = (B & C) | ((~B) & D);
                 g = step;
-            } else if (step < 32) {
+                break;
+            case 1:
                 F = (D & B) | ((~D) & C);
                 g = (5 * step + 1) % 16;
-            } else if (step < 48) {
+                break;
+            case 2:
                 F = B ^ C ^ D;
                 g = (3 * step + 5) % 16;
-            } else {
+                break;
+            case 3:
                 F = C ^ (B | (~D));
                 g = (7 * step) % 16;
+                break;
             }
+
+            // if (step < 16) {
+            //     F = (B & C) | ((~B) & D);
+            //     g = step;
+            // } else if (step < 32) {
+            //     F = (D & B) | ((~D) & C);
+            //     g = (5 * step + 1) % 16;
+            // } else if (step < 48) {
+            //     F = B ^ C ^ D;
+            //     g = (3 * step + 5) % 16;
+            // } else {
+            //     F = C ^ (B | (~D));
+            //     g = (7 * step) % 16;
+            // }
 
             F = F + A + K[step] + block[g];
             A = D;
             D = C;
             C = B;
-            B += ROTL(F, s[step]);
+            B += rotl(F, s[step]);
         }
 
         a0 += A;
