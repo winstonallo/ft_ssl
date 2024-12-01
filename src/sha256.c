@@ -1,10 +1,14 @@
+#include "bit.h"
 #include "libft.h"
 #include "ssl.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
 
 #define SHA256_BLOCK_SIZE 64
 
+// First 32 bits of the fractional parts of the square roots of the first eight
+// prime numbers.
 #define DFLT_A 0x6a09e667
 #define DFLT_B 0xbb67ae85
 #define DFLT_C 0x3c6ef372
@@ -14,6 +18,8 @@
 #define DFLT_G 0x1f83d9ab
 #define DFLT_H 0x5be0cd19
 
+// First 32 bits of the fractional parts of the cube roots of the first 64
+// prime numbers.
 static const u_int32_t K[] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -35,6 +41,52 @@ typedef struct Words {
     uint32_t G;
     uint32_t H;
 } Words;
+
+static uint32_t
+sha256_sig0(uint32_t val) {
+    uint32_t a = rotr_32(val, 7);
+    uint32_t b = rotr_32(val, 18);
+    uint32_t c = val >> 3;
+
+    return a ^ b ^ c;
+}
+
+static uint32_t
+sha256_sig1(uint32_t val) {
+    uint32_t a = rotr_32(val, 17);
+    uint32_t b = rotr_32(val, 19);
+    uint32_t c = val >> 10;
+
+    return a ^ b ^ c;
+}
+
+static uint32_t
+sha256_Sig0(uint32_t val) {
+    uint32_t a = rotr_32(val, 2);
+    uint32_t b = rotr_32(val, 13);
+    uint32_t c = rotr_32(val, 22);
+
+    return a ^ b ^ c;
+}
+
+static uint32_t
+sha256_Sig1(uint32_t val) {
+    uint32_t a = rotr_32(val, 6);
+    uint32_t b = rotr_32(val, 11);
+    uint32_t c = rotr_32(val, 25);
+
+    return a ^ b ^ c;
+}
+
+static uint32_t
+sha256_Ch(uint32_t e, uint32_t f, uint32_t g) {
+    return (e & f) ^ (~e & g);
+}
+
+static uint32_t
+sha256_Maj(uint32_t a, uint32_t b, uint32_t c) {
+    return (a & b) ^ (a & c) ^ (b & c);
+}
 
 size_t
 sha256_calculate_padding(size_t original_size) {
@@ -84,11 +136,24 @@ sha256_hash(File *msg, Words *words) {
     if (!buf.bytes) {
         return -1;
     }
+
+    uint32_t a0 = DFLT_A;
+    uint32_t b0 = DFLT_B;
+    uint32_t c0 = DFLT_C;
+    uint32_t d0 = DFLT_D;
+
+    for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += SHA256_BLOCK_SIZE) {
+
+        uint32_t *block = (void *)chunk;
+    }
+    free(buf.bytes);
     return 0;
 }
 
 int
 sha256(File *msg, char *buf) {
+    (void)msg;
+    (void)buf;
     (void)buf;
     (void)K;
 
