@@ -126,11 +126,6 @@ md5_hash(File *msg, Words *words) {
         return -1;
     }
 
-    // uint32_t a0 = DFLT_A;
-    // uint32_t b0 = DFLT_B;
-    // uint32_t c0 = DFLT_C;
-    // uint32_t d0 = DFLT_D;
-
     for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += MD5_BLOCK_SIZE) {
 
         uint32_t *block = (void *)chunk;
