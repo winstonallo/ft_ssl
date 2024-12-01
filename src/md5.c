@@ -126,19 +126,19 @@ md5_hash(File *msg, Words *words) {
         return -1;
     }
 
-    uint32_t a0 = DFLT_A;
-    uint32_t b0 = DFLT_B;
-    uint32_t c0 = DFLT_C;
-    uint32_t d0 = DFLT_D;
+    // uint32_t a0 = DFLT_A;
+    // uint32_t b0 = DFLT_B;
+    // uint32_t c0 = DFLT_C;
+    // uint32_t d0 = DFLT_D;
 
     for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += MD5_BLOCK_SIZE) {
 
         uint32_t *block = (void *)chunk;
 
-        uint32_t A = a0;
-        uint32_t B = b0;
-        uint32_t C = c0;
-        uint32_t D = d0;
+        uint32_t A = words->A;
+        uint32_t B = words->B;
+        uint32_t C = words->C;
+        uint32_t D = words->D;
 
         for (size_t step = 0; step < 64; ++step) {
             uint32_t F;
@@ -163,16 +163,11 @@ md5_hash(File *msg, Words *words) {
             B += rotl_32(F, s[step]);
         }
 
-        a0 += A;
-        b0 += B;
-        c0 += C;
-        d0 += D;
+        words->A += A;
+        words->B += B;
+        words->C += C;
+        words->D += D;
     }
-
-    words->A = a0;
-    words->B = b0;
-    words->C = c0;
-    words->D = d0;
 
     free(buf.bytes);
     return 0;
