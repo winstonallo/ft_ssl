@@ -43,7 +43,7 @@ typedef struct Words {
 } Words;
 
 static uint32_t
-sha256_sig0(uint32_t val) {
+sig0(uint32_t val) {
     uint32_t a = rotr_32(val, 7);
     uint32_t b = rotr_32(val, 18);
     uint32_t c = val >> 3;
@@ -52,7 +52,7 @@ sha256_sig0(uint32_t val) {
 }
 
 static uint32_t
-sha256_sig1(uint32_t val) {
+sig1(uint32_t val) {
     uint32_t a = rotr_32(val, 17);
     uint32_t b = rotr_32(val, 19);
     uint32_t c = val >> 10;
@@ -61,7 +61,7 @@ sha256_sig1(uint32_t val) {
 }
 
 static uint32_t
-sha256_Sig0(uint32_t val) {
+Sig0(uint32_t val) {
     uint32_t a = rotr_32(val, 2);
     uint32_t b = rotr_32(val, 13);
     uint32_t c = rotr_32(val, 22);
@@ -70,7 +70,7 @@ sha256_Sig0(uint32_t val) {
 }
 
 static uint32_t
-sha256_Sig1(uint32_t val) {
+Sig1(uint32_t val) {
     uint32_t a = rotr_32(val, 6);
     uint32_t b = rotr_32(val, 11);
     uint32_t c = rotr_32(val, 25);
@@ -79,29 +79,26 @@ sha256_Sig1(uint32_t val) {
 }
 
 static uint32_t
-sha256_Ch(uint32_t e, uint32_t f, uint32_t g) {
+Ch(uint32_t e, uint32_t f, uint32_t g) {
     return (e & f) ^ (~e & g);
 }
 
 static uint32_t
-sha256_Maj(uint32_t a, uint32_t b, uint32_t c) {
+Maj(uint32_t a, uint32_t b, uint32_t c) {
     return (a & b) ^ (a & c) ^ (b & c);
 }
 
 size_t
-sha256_calculate_padding(size_t original_size) {
-    if (original_size % 64 > 55) {
-        return SHA256_BLOCK_SIZE - ((original_size % SHA256_BLOCK_SIZE) + 1) + 56;
-    } else {
-        return SHA256_BLOCK_SIZE - ((original_size % SHA256_BLOCK_SIZE) + 1) - 8;
-    }
+calculate_padding(size_t original_size) {
+    size_t mod = original_size % SHA256_BLOCK_SIZE;
+    return mod < 56 ? 56 - mod : 64 + 56 - mod;
 }
 
 Message
 sha256_pad(File *msg) {
     Message buf = {0};
 
-    uint64_t padding_size = sha256_calculate_padding(msg->content_size);
+    uint64_t padding_size = calculate_padding(msg->content_size);
 
     ssize_t new_size = msg->content_size + padding_size + 1 + 8;
 
@@ -121,11 +118,69 @@ sha256_pad(File *msg) {
     }
 
     buf.bytes[msg->content_size] = (char)0x80;
-    *(uint64_t *)(&buf.bytes[new_size - 8]) = msg->content_size * 8;
-
+    uint64_t bit_len = (uint64_t)msg->content_size * 8;
+    for (int i = 0; i < 8; i++) {
+        buf.bytes[new_size - 1 - i] = (bit_len >> (i * 8)) & 0xFF;
+    }
     buf.len = new_size;
 
     return buf;
+}
+
+static void
+store_to_buf(char *buf, Words words) {
+    uint32_t A = words.A;
+    uint32_t B = words.B;
+    uint32_t C = words.C;
+    uint32_t D = words.D;
+    uint32_t E = words.E;
+    uint32_t F = words.G;
+    uint32_t G = words.H;
+    uint32_t H = words.H;
+
+    int idx = 0;
+
+    byte_to_hex(A & 0xFF, buf, &idx);
+    byte_to_hex((A >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((A >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((A >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(B & 0xFF, buf, &idx);
+    byte_to_hex((B >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((B >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((B >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(C & 0xFF, buf, &idx);
+    byte_to_hex((C >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((C >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((C >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(D & 0xFF, buf, &idx);
+    byte_to_hex((D >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((D >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((D >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(E & 0xFF, buf, &idx);
+    byte_to_hex((E >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((E >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((E >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(F & 0xFF, buf, &idx);
+    byte_to_hex((F >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((F >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((F >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(G & 0xFF, buf, &idx);
+    byte_to_hex((G >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((G >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((G >> 24) & 0xFF, buf, &idx);
+
+    byte_to_hex(H & 0xFF, buf, &idx);
+    byte_to_hex((H >> 8) & 0xFF, buf, &idx);
+    byte_to_hex((H >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((H >> 24) & 0xFF, buf, &idx);
+
+    buf[idx] = '\0';
 }
 
 static int
@@ -137,14 +192,54 @@ sha256_hash(File *msg, Words *words) {
         return -1;
     }
 
-    uint32_t a0 = DFLT_A;
-    uint32_t b0 = DFLT_B;
-    uint32_t c0 = DFLT_C;
-    uint32_t d0 = DFLT_D;
-
     for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += SHA256_BLOCK_SIZE) {
 
         uint32_t *block = (void *)chunk;
+
+        uint32_t sched[64];
+
+        // First 16 words of the schedule are just copied from the chunk directly.
+        ft_memcpy(sched, block, SHA256_BLOCK_SIZE);
+
+        for (size_t step = 16; step < 64; ++step) {
+            sched[step] = sig1(sched[step - 2]) + sched[step - 7] + sig0(sched[step - 15]) + sched[step - 16];
+        }
+
+        for (size_t i = 0; i < 16; i++) {
+            sched[i] = (chunk[i * 4] << 24) | (chunk[i * 4 + 1] << 16) | (chunk[i * 4 + 2] << 8) | (chunk[i * 4 + 3]);
+        }
+
+        uint32_t A = words->A;
+        uint32_t B = words->B;
+        uint32_t C = words->C;
+        uint32_t D = words->D;
+        uint32_t E = words->E;
+        uint32_t F = words->F;
+        uint32_t G = words->G;
+        uint32_t H = words->H;
+
+        for (size_t step = 0; step < 64; ++step) {
+            uint32_t t1 = Sig1(E) + Ch(E, F, G) + H + K[step] + sched[step];
+            uint32_t t2 = Sig0(A) + Maj(A, B, C);
+
+            H = G;
+            G = F;
+            F = E;
+            E = D + t1;
+            D = C;
+            C = B;
+            B = A;
+            A = t1 + t2;
+        }
+
+        words->A += A;
+        words->B += B;
+        words->C += C;
+        words->D += D;
+        words->E += E;
+        words->F += F;
+        words->G += G;
+        words->H += H;
     }
     free(buf.bytes);
     return 0;
@@ -152,12 +247,10 @@ sha256_hash(File *msg, Words *words) {
 
 int
 sha256(File *msg, char *buf) {
-    (void)msg;
-    (void)buf;
-    (void)buf;
-    (void)K;
 
     Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D, DFLT_E, DFLT_F, DFLT_G, DFLT_H};
     sha256_hash(msg, &words);
+
+    store_to_buf(buf, words);
     return 0;
 }

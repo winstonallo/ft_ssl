@@ -13,7 +13,7 @@ static const Algo algo_map[] = {
 
 static const char *algo_names[] = {"md5\0", "sha256\0"};
 
-static const u_int64_t algo_buffer_sizes[] = {33, 256};
+static const u_int64_t algo_buffer_sizes[] = {33, 65};
 
 int
 main(int ac, char **av) {
