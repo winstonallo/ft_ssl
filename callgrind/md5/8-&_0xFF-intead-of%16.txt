@@ -37,15 +37,15 @@ Ir
           .           #include <sys/types.h>
           .           
           .           // Rotates `val` to the left by `by` bits.
-          .           u_int32_t
-218,846,208 ( 3.69%)  rotl(u_int32_t val, const u_int32_t by) {
+          .           uint32_t
+218,846,208 ( 3.69%)  rotl(uint32_t val, const uint32_t by) {
 2,571,442,948 (43.37%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (54,711,552x)
 164,134,656 ( 2.77%)      return (val << by) | (val >> (32 - by));
 109,423,104 ( 1.85%)  }
           .           
           .           // Rotates `val` to the right by `by` bits.
-          .           u_int32_t
-          .           rotr(u_int32_t val, const u_int32_t by) {
+          .           uint32_t
+          .           rotr(uint32_t val, const uint32_t by) {
           .               return (val >> by) | (val << (32 - by));
           .           }
 
@@ -99,15 +99,15 @@ Ir
           .           #include <sys/types.h>
           .           
           .           // Rotates `val` to the left by `by` bits.
-          .           u_int32_t
-218,846,208 ( 3.69%)  rotl(u_int32_t val, const u_int32_t by) {
+          .           uint32_t
+218,846,208 ( 3.69%)  rotl(uint32_t val, const uint32_t by) {
 2,571,442,948 (43.37%)  => ./gmon/../sysdeps/x86_64/_mcount.S:mcount (54,711,552x)
 164,134,656 ( 2.77%)      return (val << by) | (val >> (32 - by));
 109,423,104 ( 1.85%)  }
           .           
           .           // Rotates `val` to the right by `by` bits.
-          .           u_int32_t
-          .           rotr(u_int32_t val, const u_int32_t by) {
+          .           uint32_t
+          .           rotr(uint32_t val, const uint32_t by) {
           .               return (val >> by) | (val << (32 - by));
           .           }
 
