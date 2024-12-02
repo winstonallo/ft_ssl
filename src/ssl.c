@@ -11,7 +11,7 @@ static const Algo algo_map[] = {
     sha256, // CMD_SHA256
 };
 
-static const char *algo_names[] = {"md5\0", "sha256\0"};
+static const char *algo_names[] = {"md5\0", "SHA2-256\0"};
 
 static const u_int64_t algo_buffer_sizes[] = {33, 65};
 

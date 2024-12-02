@@ -22,13 +22,13 @@
 // prime numbers.
 static const u_int32_t K[] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+   0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+   0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+   0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+   0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+   0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+   0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+   0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
 typedef struct Words {
@@ -44,38 +44,22 @@ typedef struct Words {
 
 static uint32_t
 sig0(uint32_t val) {
-    uint32_t a = rotr_32(val, 7);
-    uint32_t b = rotr_32(val, 18);
-    uint32_t c = val >> 3;
-
-    return a ^ b ^ c;
+    return rotr_32(val, 7) ^ rotr_32(val, 18) ^ val >> 3;
 }
 
 static uint32_t
 sig1(uint32_t val) {
-    uint32_t a = rotr_32(val, 17);
-    uint32_t b = rotr_32(val, 19);
-    uint32_t c = val >> 10;
-
-    return a ^ b ^ c;
+    return rotr_32(val, 17) ^ rotr_32(val, 19) ^ val >> 10;
 }
 
 static uint32_t
 Sig0(uint32_t val) {
-    uint32_t a = rotr_32(val, 2);
-    uint32_t b = rotr_32(val, 13);
-    uint32_t c = rotr_32(val, 22);
-
-    return a ^ b ^ c;
+    return rotr_32(val, 2) ^ rotr_32(val, 13) ^ rotr_32(val, 22);
 }
 
 static uint32_t
 Sig1(uint32_t val) {
-    uint32_t a = rotr_32(val, 6);
-    uint32_t b = rotr_32(val, 11);
-    uint32_t c = rotr_32(val, 25);
-
-    return a ^ b ^ c;
+    return rotr_32(val, 6) ^ rotr_32(val, 11) ^ rotr_32(val, 25);
 }
 
 static uint32_t
@@ -90,8 +74,11 @@ Maj(uint32_t a, uint32_t b, uint32_t c) {
 
 size_t
 calculate_padding(size_t original_size) {
-    size_t mod = original_size % SHA256_BLOCK_SIZE;
-    return mod < 56 ? 56 - mod : 64 + 56 - mod;
+    if (original_size % 64 > 55) {
+        return SHA256_BLOCK_SIZE - ((original_size % SHA256_BLOCK_SIZE) + 1) + 56;
+    } else {
+        return SHA256_BLOCK_SIZE - ((original_size % SHA256_BLOCK_SIZE) + 1) - 8;
+    }
 }
 
 Message
@@ -118,10 +105,10 @@ sha256_pad(File *msg) {
     }
 
     buf.bytes[msg->content_size] = (char)0x80;
-    uint64_t bit_len = (uint64_t)msg->content_size * 8;
-    for (int i = 0; i < 8; i++) {
-        buf.bytes[new_size - 1 - i] = (bit_len >> (i * 8)) & 0xFF;
-    }
+    *(uint64_t *)(&buf.bytes[new_size - 8]) = __builtin_bswap32(msg->content_size * 8);
+
+    
+
     buf.len = new_size;
 
     return buf;
@@ -205,10 +192,6 @@ sha256_hash(File *msg, Words *words) {
             sched[step] = sig1(sched[step - 2]) + sched[step - 7] + sig0(sched[step - 15]) + sched[step - 16];
         }
 
-        for (size_t i = 0; i < 16; i++) {
-            sched[i] = (chunk[i * 4] << 24) | (chunk[i * 4 + 1] << 16) | (chunk[i * 4 + 2] << 8) | (chunk[i * 4 + 3]);
-        }
-
         uint32_t A = words->A;
         uint32_t B = words->B;
         uint32_t C = words->C;
@@ -219,7 +202,7 @@ sha256_hash(File *msg, Words *words) {
         uint32_t H = words->H;
 
         for (size_t step = 0; step < 64; ++step) {
-            uint32_t t1 = Sig1(E) + Ch(E, F, G) + H + K[step] + sched[step];
+            uint32_t t1 = H + Sig1(E) + Ch(E, F, G) + H + K[step] + sched[step];
             uint32_t t2 = Sig0(A) + Maj(A, B, C);
 
             H = G;
