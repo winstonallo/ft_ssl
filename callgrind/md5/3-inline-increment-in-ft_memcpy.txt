@@ -35,14 +35,14 @@ Ir
           .           #include <sys/types.h>
           .           
           .           // Rotates `val` to the left by `by` bits.
-          .           u_int32_t
-273,557,760 ( 6.63%)  rotl(u_int32_t val, const u_int32_t by) {
+          .           uint32_t
+273,557,760 ( 6.63%)  rotl(uint32_t val, const uint32_t by) {
 273,557,760 ( 6.63%)      return (val << by) | (val >> (32 - by));
 109,423,104 ( 2.65%)  }
           .           
           .           // Rotates `val` to the right by `by` bits.
-          .           u_int32_t
-          .           rotr(u_int32_t val, const u_int32_t by) {
+          .           uint32_t
+          .           rotr(uint32_t val, const uint32_t by) {
           .               return (val >> by) | (val << (32 - by));
           .           }
 
