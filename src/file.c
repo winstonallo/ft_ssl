@@ -1,8 +1,10 @@
 #include "libft.h"
 #include "ssl.h"
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -65,7 +67,7 @@ file_read_all(Options *const opts) {
     while (head) {
         int fd = open(head->path, O_RDONLY);
         if (fd == -1) {
-            perror("opening message to digest");
+            ft_printf(STDERR_FILENO, "open '%s': %s\n", head->path, strerror(errno));
             return -1;
         }
 
