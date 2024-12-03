@@ -11,7 +11,7 @@ static const Algo algo_map[] = {
     sha256, // CMD_SHA256
 };
 
-static const char *algo_names[] = {"md5\0", "SHA2-256\0"};
+static const char *algo_names[] = {"MD5\0", "SHA2-256\0"};
 
 static const u_int64_t algo_buffer_sizes[] = {33, 65};
 
@@ -44,7 +44,7 @@ main(int ac, char **av) {
     for (File *it = opts.targets; it; it = it->next) {
         char buf[algo_buffer_sizes[cmd]];
         algo_map[cmd](it, buf);
-        display(buf, (char *)algo_names[cmd], (char *)it->path, &opts);
+        display(buf, (char *)algo_names[cmd], it, &opts);
     }
 
     options_cleanup(opts.targets);

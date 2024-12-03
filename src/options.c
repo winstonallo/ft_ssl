@@ -170,8 +170,10 @@ options_parse(struct Options *const opts, char **av) {
     }
 
     for (int idx = 2; av[idx]; ++idx) {
-        if (av[idx][0] == '-' && options_add_opt(opts, cmd, av[idx]) == -1) {
-            return -1;
+        if (av[idx][0] == '-') {
+            if (options_add_opt(opts, cmd, av[idx]) == -1) {
+                return -1;
+            }
         } else if (options_add_file(opts, av[idx]) == -1) {
             return -1;
         }

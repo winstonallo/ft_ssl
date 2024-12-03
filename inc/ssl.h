@@ -12,7 +12,7 @@
 
 typedef struct File {
     const char *path;
-    void *content;
+    uint8_t *content;
     ssize_t content_size;
     ssize_t allocated_bytes;
     bool reallocated;
@@ -62,6 +62,6 @@ int file_read_all(Options *const opts);
 void byte_to_hex(u_int8_t byte, char *buf, int *idx);
 
 // display.c
-void display(char *hash, char *algo_name, char *file_path, const struct Options *const opts);
+void display(char *hash, char *algo_name, File *file, const struct Options *const opts);
 
 #endif
