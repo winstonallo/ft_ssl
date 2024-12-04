@@ -29,6 +29,7 @@ typedef struct Options {
     bool p;
     bool q;
     bool r;
+    bool h;
     File *targets;
 } Options;
 
