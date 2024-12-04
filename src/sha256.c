@@ -86,7 +86,7 @@ sha256_pad(File *msg) {
 
     if (new_size >= msg->allocated_bytes) {
         msg->reallocated = true;
-        buf.bytes = malloc(new_size * sizeof(char));
+        buf.bytes = ft_calloc(new_size, sizeof(char));
         if (!buf.bytes) {
             return buf;
         }
@@ -95,7 +95,7 @@ sha256_pad(File *msg) {
     }
 
     ft_memcpy(buf.bytes, msg->content, msg->content_size);
-    if (msg->reallocated) {
+    if (msg->reallocated && !msg->option_s) {
         free(msg->content);
     }
 

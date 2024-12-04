@@ -67,7 +67,7 @@ md5_pad(File *msg) {
 
     if (new_size >= msg->allocated_bytes) {
         msg->reallocated = true;
-        buf.bytes = malloc(new_size * sizeof(char));
+        buf.bytes = ft_calloc(new_size, sizeof(char));
         if (!buf.bytes) {
             return buf;
         }
