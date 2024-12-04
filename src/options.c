@@ -9,7 +9,7 @@
 static int options_add_file(Options *const opts, const char *const arg, bool content);
 
 #define INVALID_COMMAND(cmd)                                                                                           \
-    { ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"help\" for a list.\n", cmd); }
+    { ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", cmd); }
 
 #define INVALID_OPTION(algo, cmd)                                                                                      \
     {                                                                                                                  \
