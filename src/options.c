@@ -88,6 +88,7 @@ file_new(const char *const path) {
     file->content_size = 0;
     file->reallocated = false;
     file->content = NULL;
+    file->option_s = false;
 
     return file;
 }
@@ -168,6 +169,9 @@ options_cleanup(File *head) {
     File *prev;
 
     while (head) {
+        if (head->allocated_bytes) {
+            free(head->content);
+        }
         prev = head;
         head = head->next;
         free(prev);

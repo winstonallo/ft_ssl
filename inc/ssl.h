@@ -13,8 +13,8 @@
 typedef struct File {
     const char *path;
     uint8_t *content;
-    ssize_t content_size;
-    ssize_t allocated_bytes;
+    size_t content_size;
+    size_t allocated_bytes;
     bool reallocated;
     bool option_s;
     struct File *next;
