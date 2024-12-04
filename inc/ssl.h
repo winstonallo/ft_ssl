@@ -46,7 +46,7 @@ int md5(File *msg, char *buf);
 int sha256(File *msg, char *buf);
 
 // help.c
-int help(char *msg, char *buf);
+int help();
 
 // options.c
 Command options_parse(struct Options *const args, char **argv);

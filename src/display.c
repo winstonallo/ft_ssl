@@ -1,6 +1,5 @@
 #include "libft.h"
 #include "ssl.h"
-#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 
