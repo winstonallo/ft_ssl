@@ -16,6 +16,7 @@ typedef struct File {
     ssize_t content_size;
     ssize_t allocated_bytes;
     bool reallocated;
+    bool option_s;
     struct File *next;
 } File;
 
@@ -28,7 +29,6 @@ typedef struct Options {
     bool p;
     bool q;
     bool r;
-    bool s;
     File *targets;
 } Options;
 

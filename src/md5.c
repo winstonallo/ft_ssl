@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #define MD5_BLOCK_SIZE 64 // 512 bits
 
@@ -75,7 +76,7 @@ md5_pad(File *msg) {
     }
 
     ft_memcpy(buf.bytes, msg->content, msg->content_size);
-    if (msg->reallocated) {
+    if (msg->reallocated && !msg->option_s) {
         free(msg->content);
     }
 
@@ -121,6 +122,7 @@ md5_store_to_buf(char *buf, Words words) {
 
 static int
 md5_hash(File *msg, Words *words) {
+
     Message buf = md5_pad(msg);
     if (!buf.bytes) {
         return -1;

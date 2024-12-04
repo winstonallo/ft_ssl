@@ -65,6 +65,12 @@ file_read_all(Options *const opts) {
     }
 
     while (head) {
+
+        if (head->content) {
+            head = head->next;
+            continue;
+        }
+
         int fd = open(head->path, O_RDONLY);
         if (fd == -1) {
             ft_printf(STDERR_FILENO, "open '%s': %s\n", head->path, strerror(errno));

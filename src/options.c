@@ -1,9 +1,12 @@
 #include "libft.h"
 #include "ssl.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+
+static int options_add_file(Options *const opts, const char *const arg, bool content);
 
 #define INVALID_COMMAND(cmd)                                                                                           \
     { ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"help\" for a list.\n", cmd); }
@@ -23,7 +26,7 @@
                   cmd, algo_name);                                                                                     \
     }
 
-typedef void (*OptionHandler)(struct Options *const);
+typedef int (*OptionHandler)(struct Options *const, char **, size_t *);
 
 typedef struct {
     const char *s;
@@ -31,24 +34,37 @@ typedef struct {
     OptionHandler handler;
 } OptionEntry;
 
-static void
-options_add_p(Options *const opts) {
+static int
+options_add_p(Options *const opts, char **av, size_t *idx) {
+    (void)av;
+    (void)idx;
     opts->p = true;
+    return 0;
 }
 
-static void
-options_add_q(Options *const opts) {
+static int
+options_add_q(Options *const opts, char **av, size_t *idx) {
+    (void)av;
+    (void)idx;
     opts->q = true;
+    return 0;
 }
 
-static void
-options_add_r(Options *const opts) {
+static int
+options_add_r(Options *const opts, char **av, size_t *idx) {
+    (void)av;
+    (void)idx;
     opts->r = true;
+    return 0;
 }
 
-static void
-options_add_s(Options *const opts) {
-    opts->s = true;
+static int
+options_add_s(Options *const opts, char **av, size_t *idx) {
+    if (av[(*idx) + 1]) {
+        *idx += 1;
+    }
+
+    return options_add_file(opts, av[*idx], true);
 }
 
 static const OptionEntry option_map[] = {
@@ -92,6 +108,26 @@ file_add_back(File **head, File *new) {
     it->next = new;
 }
 
+static int
+options_add_file(Options *const opts, const char *const arg, bool content) {
+    File *new = file_new(arg);
+
+    if (!new) {
+        options_cleanup(opts->targets);
+        MALLOC_ERROR("could not allocate memory");
+        return -1;
+    }
+
+    if (content) {
+        new->option_s = true;
+        new->content_size = ft_strlen(arg);
+        new->content = (uint8_t *)arg;
+    }
+
+    file_add_back(&opts->targets, new);
+    return 0;
+}
+
 static Command
 options_get_command(const char *const cmd) {
     if (!ft_strncmp("md5", (void *)cmd, 4)) {
@@ -106,34 +142,20 @@ options_get_command(const char *const cmd) {
 }
 
 static int
-options_add_opt(Options *const opts, Command cmd, const char *const arg) {
+options_add_opt(Options *const opts, Command cmd, char **av, size_t *idx) {
+
     const OptionEntry *entry = option_map;
-    while (entry->s != NULL && STRCMP(entry->s, arg) && STRCMP(entry->l, arg)) {
+    while (entry->s != NULL && STRCMP(entry->s, av[*idx]) && STRCMP(entry->l, av[*idx])) {
         entry++;
     }
 
     if (entry->s == NULL) {
         options_cleanup(opts->targets);
-        INVALID_OPTION(cmd, arg);
+        INVALID_OPTION(cmd, av[*idx]);
         return -1;
     }
 
-    entry->handler(opts);
-    return 0;
-}
-
-static int
-options_add_file(Options *const opts, const char *const arg) {
-    File *new = file_new(arg);
-
-    if (!new) {
-        options_cleanup(opts->targets);
-        MALLOC_ERROR("could not allocate memory");
-        return -1;
-    }
-
-    file_add_back(&opts->targets, new);
-    return 0;
+    return entry->handler(opts, av, idx);
 }
 
 // Cleans up all heap memory allocated for dynamic content (as of now only message
@@ -169,17 +191,17 @@ options_parse(struct Options *const opts, char **av) {
         return CMD_INVALID;
     }
 
-    for (int idx = 2; av[idx]; ++idx) {
+    for (size_t idx = 2; av[idx]; ++idx) {
         if (av[idx][0] == '-') {
-            if (options_add_opt(opts, cmd, av[idx]) == -1) {
+            if (options_add_opt(opts, cmd, av, &idx) == -1) {
                 return -1;
             }
-        } else if (options_add_file(opts, av[idx]) == -1) {
+        } else if (options_add_file(opts, av[idx], false) == -1) {
             return -1;
         }
     }
 
-    if (opts->targets == NULL && options_add_file(opts, "stdin") == -1) {
+    if (opts->targets == NULL && options_add_file(opts, "stdin", false) == -1) {
         return -1;
     }
 
