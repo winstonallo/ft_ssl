@@ -82,7 +82,7 @@ sha256_pad(File *msg) {
 
     uint64_t padding_size = calculate_padding(msg->content_size);
 
-    ssize_t new_size = msg->content_size + padding_size + 1 + 8;
+    size_t new_size = msg->content_size + padding_size + 1 + 8;
 
     if (new_size >= msg->allocated_bytes) {
         msg->reallocated = true;
