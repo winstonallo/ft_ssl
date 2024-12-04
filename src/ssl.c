@@ -18,7 +18,7 @@ static const u_int64_t algo_buffer_sizes[] = {33, 65};
 int
 main(int ac, char **av) {
     if (ac < 2) {
-        help(NULL, NULL);
+        help();
         return EXIT_SUCCESS;
     }
 
@@ -31,7 +31,7 @@ main(int ac, char **av) {
     }
 
     if (cmd == CMD_HELP) {
-        help(NULL, NULL);
+        help();
         options_cleanup(opts.targets);
         return EXIT_SUCCESS;
     }
