@@ -6,7 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 
-static int options_add_file(Options *const opts, const char *const arg, bool content);
+static int add_file(Options *const opts, const char *const arg, bool content);
 
 #define INVALID_COMMAND(cmd)                                                                                           \
     { ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", cmd); }
@@ -35,7 +35,7 @@ typedef struct {
 } OptionEntry;
 
 static int
-options_add_p(Options *const opts, char **av, size_t *idx) {
+add_p(Options *const opts, char **av, size_t *idx) {
     (void)av;
     (void)idx;
     opts->p = true;
@@ -43,7 +43,7 @@ options_add_p(Options *const opts, char **av, size_t *idx) {
 }
 
 static int
-options_add_q(Options *const opts, char **av, size_t *idx) {
+add_q(Options *const opts, char **av, size_t *idx) {
     (void)av;
     (void)idx;
     opts->q = true;
@@ -51,7 +51,7 @@ options_add_q(Options *const opts, char **av, size_t *idx) {
 }
 
 static int
-options_add_r(Options *const opts, char **av, size_t *idx) {
+add_r(Options *const opts, char **av, size_t *idx) {
     (void)av;
     (void)idx;
     opts->r = true;
@@ -59,19 +59,19 @@ options_add_r(Options *const opts, char **av, size_t *idx) {
 }
 
 static int
-options_add_s(Options *const opts, char **av, size_t *idx) {
+add_s(Options *const opts, char **av, size_t *idx) {
     if (av[(*idx) + 1]) {
         *idx += 1;
     }
 
-    return options_add_file(opts, av[*idx], true);
+    return add_file(opts, av[*idx], true);
 }
 
 static const OptionEntry option_map[] = {
-    {"-p", "--print",   options_add_p},
-    {"-q", "--quiet",   options_add_q},
-    {"-r", "--reverse", options_add_r},
-    {"-s", "--sum",     options_add_s},
+    {"-p", "--print",   add_p},
+    {"-q", "--quiet",   add_q},
+    {"-r", "--reverse", add_r},
+    {"-s", "--sum",     add_s},
     {NULL, NULL,        NULL         },
 };
 
@@ -111,7 +111,7 @@ file_add_back(File **head, File *new) {
 }
 
 static int
-options_add_file(Options *const opts, const char *const arg, bool content) {
+add_file(Options *const opts, const char *const arg, bool content) {
     File *new = file_new(arg);
 
     if (!new) {
@@ -131,7 +131,7 @@ options_add_file(Options *const opts, const char *const arg, bool content) {
 }
 
 static Command
-options_get_command(const char *const cmd) {
+get_command(const char *const cmd) {
     if (!ft_strncmp("md5", (void *)cmd, 4)) {
         return CMD_MD5;
     } else if (!ft_strncmp("sha256", (void *)cmd, 7)) {
@@ -144,7 +144,7 @@ options_get_command(const char *const cmd) {
 }
 
 static int
-options_add_opt(Options *const opts, Command cmd, char **av, size_t *idx) {
+add_opt(Options *const opts, Command cmd, char **av, size_t *idx) {
 
     const OptionEntry *entry = option_map;
     while (entry->s != NULL && STRCMP(entry->s, av[*idx]) && STRCMP(entry->l, av[*idx])) {
@@ -188,7 +188,7 @@ Command
 options_parse(struct Options *const opts, char **av) {
     Command cmd;
 
-    if ((cmd = options_get_command(av[1])) == CMD_INVALID) {
+    if ((cmd = get_command(av[1])) == CMD_INVALID) {
         INVALID_COMMAND(av[1]);
         return CMD_INVALID;
     }
@@ -200,15 +200,15 @@ options_parse(struct Options *const opts, char **av) {
 
     for (size_t idx = 2; av[idx]; ++idx) {
         if (av[idx][0] == '-') {
-            if (options_add_opt(opts, cmd, av, &idx) == -1) {
+            if (add_opt(opts, cmd, av, &idx) == -1) {
                 return -1;
             }
-        } else if (options_add_file(opts, av[idx], false) == -1) {
+        } else if (add_file(opts, av[idx], false) == -1) {
             return -1;
         }
     }
 
-    if (opts->targets == NULL && options_add_file(opts, "stdin", false) == -1) {
+    if (opts->targets == NULL && add_file(opts, "stdin", false) == -1) {
         return -1;
     }
 

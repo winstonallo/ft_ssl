@@ -30,7 +30,6 @@ file_read(int fd, File *file) {
 
             u_int8_t *tmp = buf_realloc(file->content, file->allocated_bytes, total_size);
             if (!tmp) {
-                free(file->content);
                 ft_printf(STDERR_FILENO, "could not reallocate %d bytes for `%s`: %s\n", file->allocated_bytes, file->path, strerror(errno));
                 return -1;
             }
