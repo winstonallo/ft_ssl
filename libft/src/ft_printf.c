@@ -51,12 +51,14 @@ ft_printf(int fd, const char *s, ...) {
     while (*s) {
         if (*s == '%') {
             s++;
-            if (ft_strchr("cspdiuxX", *s))
+            if (ft_strchr("cspdiuxX", *s)) {
                 i += ft_distribute_args(fd, s, va_arg(args, void *));
-            else if (*s == '%')
+            } else if (*s == '%') {
                 i += ft_putchar_int(fd, '%');
-        } else
+            }
+        } else {
             i += ft_putchar_int(fd, *s);
+        }
         s++;
     }
     va_end(args);

@@ -192,7 +192,7 @@ options_parse(struct Options *const opts, char **av) {
     Command cmd;
 
     if ((cmd = get_command(av[1])) == CMD_INVALID) {
-        ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", cmd);
+        ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", av[1]);
         return CMD_INVALID;
     }
 
