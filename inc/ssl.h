@@ -14,6 +14,7 @@ typedef struct File {
     const char *path;
     uint8_t *content;
     size_t content_size;
+    bool allocated;
     size_t allocated_bytes;
     bool reallocated;
     bool option_s;

@@ -8,16 +8,18 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-int
+static int
 file_read(int fd, File *file) {
     size_t total_size = 0;
     file->allocated_bytes = BUFSIZ;
 
     file->content = ft_calloc(file->allocated_bytes, sizeof(char));
     if (!file->content) {
-        perror("initial buffer allocation for message to digest");
+        ft_printf(STDERR_FILENO, "could not make initial allocation of %d bytes for `%s`: %s\n", BUFSIZ, file->path, strerror(errno));
         return -1;
     }
+
+    file->allocated = true;
 
     ssize_t bytes_read;
     while ((bytes_read = read(fd, file->content + total_size, file->allocated_bytes - total_size)) > 0) {
@@ -25,18 +27,20 @@ file_read(int fd, File *file) {
 
         if (total_size >= file->allocated_bytes) {
             file->allocated_bytes *= 2;
+
             u_int8_t *tmp = buf_realloc(file->content, file->allocated_bytes, total_size);
             if (!tmp) {
                 free(file->content);
-                perror("buf_realloc");
+                ft_printf(STDERR_FILENO, "could not reallocate %d bytes for `%s`: %s\n", file->allocated_bytes, file->path, strerror(errno));
                 return -1;
             }
+
             file->content = tmp;
         }
     }
 
     if (bytes_read == -1) {
-        perror("reading message to digest");
+        ft_printf(STDERR_FILENO, "could not read `%s`: %s\n", file->path, strerror(errno));
         return -1;
     }
 
@@ -78,7 +82,6 @@ file_read_all(Options *const opts) {
         }
 
         if (file_read(fd, head) == -1) {
-            options_cleanup(opts->targets);
             return -1;
         }
 
