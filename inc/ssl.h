@@ -7,9 +7,6 @@
 
 #define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
 
-#define MALLOC_ERROR(msg)                                                                                              \
-    { perror(msg); }
-
 typedef struct File {
     const char *path;
     uint8_t *content;

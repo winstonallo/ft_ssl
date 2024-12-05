@@ -1,8 +1,10 @@
 #include "libft.h"
 #include "ssl.h"
+#include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -116,7 +118,7 @@ add_file(Options *const opts, const char *const arg, bool content) {
 
     if (!new) {
         options_cleanup(opts->targets);
-        MALLOC_ERROR("could not allocate memory");
+        ft_printf(STDERR_FILENO, "could not allocate list node for `%s`: %s", arg, strerror(errno));
         return -1;
     }
 
