@@ -38,7 +38,11 @@ main(int ac, char **av) {
         }
 
         char buf[algo->output_buffer_size];
-        algo->hash_func(it, buf);
+
+        if (algo->hash_func(it, buf) == -1) {
+            continue;
+        }
+
         display(buf, algo->display_name, it, &opts);
     }
 
