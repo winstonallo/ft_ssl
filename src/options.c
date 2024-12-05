@@ -59,6 +59,7 @@ add_r(Options *const opts, char **av, size_t *idx) {
 
 static int
 add_s(Options *const opts, char **av, size_t *idx) {
+
     if (!av[(*idx) + 1]) {
         ft_printf(STDERR_FILENO, "ft_ssl: -s option needs to be followed by an input string\n");
         return -1;
@@ -79,6 +80,7 @@ static const OptionEntry option_map[] = {
 
 static File *
 file_new(const char *const path) {
+
     File *file = malloc(sizeof(File));
     if (!file) {
         return NULL;
@@ -149,7 +151,7 @@ static int
 add_opt(Options *const opts, Command cmd, char **av, size_t *idx) {
 
     const OptionEntry *entry = option_map;
-    while (entry->s != NULL && STRCMP(entry->s, av[*idx]) && STRCMP(entry->l, av[*idx])) {
+    while (entry->s != NULL && ft_strncmp(entry->s, av[*idx], 3) && ft_strncmp(entry->l, av[*idx], 10)) {
         entry++;
     }
 

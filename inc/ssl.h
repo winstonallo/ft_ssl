@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
-
 typedef struct File {
     const char *path;
     uint8_t *content;
