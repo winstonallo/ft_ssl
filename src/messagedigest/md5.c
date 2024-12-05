@@ -48,20 +48,14 @@ typedef struct Words {
     uint32_t D;
 } Words;
 
-size_t
-md5_calculate_padding(size_t original_size) {
-    if (original_size % 64 > 55) {
-        return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) + 56;
-    } else {
-        return MD5_BLOCK_SIZE - ((original_size % MD5_BLOCK_SIZE) + 1) - 8;
-    }
-}
-
-Message
+// When padding the message, we append a single `1` bit to the message, followed by `k` `0` bits such
+// that where `k` is the minimum number `>= 0` such that `(L + 1 + k + 64) % 512 == 0` holds true.
+// Finally, we append the original length of the message in bits as a big-endian 64-bit integer.
+static Message
 md5_pad(File *msg) {
     Message buf = {0};
 
-    uint64_t padding_size = md5_calculate_padding(msg->content_size);
+    uint64_t padding_size = MD5_BLOCK_SIZE - ((msg->content_size % MD5_BLOCK_SIZE) + 1) + ((msg->content_size % 64 > 55) ? 56 : (-8));
 
     size_t new_size = msg->content_size + padding_size + 1 + 8;
 
@@ -81,7 +75,13 @@ md5_pad(File *msg) {
     }
 
     buf.bytes[msg->content_size] = (char)0x80;
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
     *(uint64_t *)(&buf.bytes[new_size - 8]) = msg->content_size * 8;
+#else 
+    *(uint64_t *)(&buf.bytes[new_size - 8]) = __builtin_bswap64(msg->content_size * 8);
+#endif
+
 
     buf.len = new_size;
 
@@ -97,6 +97,7 @@ md5_store_to_buf(char *buf, Words words) {
 
     int idx = 0;
 
+#if __BYTE_ORDER == __LITTLE_ENDIAN
     byte_to_hex(A & 0xFF, buf, &idx);
     byte_to_hex((A >> 8) & 0xFF, buf, &idx);
     byte_to_hex((A >> 16) & 0xFF, buf, &idx);
@@ -116,6 +117,27 @@ md5_store_to_buf(char *buf, Words words) {
     byte_to_hex((D >> 8) & 0xFF, buf, &idx);
     byte_to_hex((D >> 16) & 0xFF, buf, &idx);
     byte_to_hex((D >> 24) & 0xFF, buf, &idx);
+#else 
+    byte_to_hex((A >> 24) & 0xFF, buf, &idx);
+    byte_to_hex((A >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((A >> 8) & 0xFF, buf, &idx);
+    byte_to_hex(A & 0xFF, buf, &idx);
+
+    byte_to_hex((B >> 24) & 0xFF, buf, &idx);
+    byte_to_hex((B >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((B >> 8) & 0xFF, buf, &idx);
+    byte_to_hex(B & 0xFF, buf, &idx);
+
+    byte_to_hex((C >> 24) & 0xFF, buf, &idx);
+    byte_to_hex((C >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((C >> 8) & 0xFF, buf, &idx);
+    byte_to_hex(C & 0xFF, buf, &idx);
+
+    byte_to_hex((D >> 24) & 0xFF, buf, &idx);
+    byte_to_hex((D >> 16) & 0xFF, buf, &idx);
+    byte_to_hex((D >> 8) & 0xFF, buf, &idx);
+    byte_to_hex(D & 0xFF, buf, &idx);
+#endif
 
     buf[idx] = '\0';
 }
