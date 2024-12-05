@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#define STRCMP(a, b) (ft_strncmp(a, b, ft_strlen(a)))
-
 typedef struct File {
     const char *path;
     uint8_t *content;
@@ -17,6 +15,14 @@ typedef struct File {
     bool option_s;
     struct File *next;
 } File;
+
+typedef struct Algo {
+    int (*hash_func)(File *, char *);
+    char *name;
+    uint8_t output_buffer_size;
+} Algo;
+
+extern const Algo algo_map[];
 
 typedef struct Message {
     uint8_t *bytes;
