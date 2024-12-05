@@ -32,7 +32,7 @@ ft_allocate_room(int i) {
     char *s;
 
     s = malloc((i + 1) * (sizeof(char)));
-    if (s == NULL)
+    if (!s)
         return (0);
     return (s);
 }
@@ -52,6 +52,9 @@ ft_putnbr_int(int fd, int n) {
     }
     len = i;
     res = ft_allocate_room(i);
+    if (!res) {
+        return -1;
+    }
     *(res + i) = 0;
     while (i--) {
         *(res + i) = ln % 10 + 48;
