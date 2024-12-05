@@ -10,9 +10,6 @@
 
 static int add_file(Options *const opts, const char *const arg, bool content);
 
-#define INVALID_COMMAND(cmd)                                                                                           \
-    { ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", cmd); }
-
 #define INVALID_OPTION(algo, cmd)                                                                                      \
     {                                                                                                                  \
         char *algo_name;                                                                                               \
@@ -62,9 +59,12 @@ add_r(Options *const opts, char **av, size_t *idx) {
 
 static int
 add_s(Options *const opts, char **av, size_t *idx) {
-    if (av[(*idx) + 1]) {
-        *idx += 1;
+    if (!av[(*idx) + 1]) {
+        ft_printf(STDERR_FILENO, "ft_ssl: -s option needs to be followed by an input string\n");
+        return -1;
     }
+
+    *idx += 1;
 
     return add_file(opts, av[*idx], true);
 }
@@ -74,7 +74,7 @@ static const OptionEntry option_map[] = {
     {"-q", "--quiet",   add_q},
     {"-r", "--reverse", add_r},
     {"-s", "--sum",     add_s},
-    {NULL, NULL,        NULL         },
+    {NULL, NULL,        NULL },
 };
 
 static File *
@@ -191,7 +191,7 @@ options_parse(struct Options *const opts, char **av) {
     Command cmd;
 
     if ((cmd = get_command(av[1])) == CMD_INVALID) {
-        INVALID_COMMAND(av[1]);
+        ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", cmd);
         return CMD_INVALID;
     }
 
