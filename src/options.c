@@ -10,19 +10,18 @@
 
 static int add_file(Options *const opts, const char *const arg, bool content);
 
-#define INVALID_OPTION(algo, cmd)                                                                                      \
-    {                                                                                                                  \
-        char *algo_name;                                                                                               \
-                                                                                                                       \
-        if (algo == CMD_HELP) {                                                                                        \
-            algo_name = "help";                                                                                        \
-        } else if (algo == CMD_MD5) {                                                                                  \
-            algo_name = "md5";                                                                                         \
-        } else {                                                                                                       \
-            algo_name = "sha256";                                                                                      \
-        }                                                                                                              \
-        ft_printf(STDERR_FILENO, "%s: Unknown option for message digest: %s\n%s: Use -help for summary.\n", algo_name, \
-                  cmd, algo_name);                                                                                     \
+#define INVALID_OPTION(algo, cmd)                                                                                                                              \
+    {                                                                                                                                                          \
+        char *algo_name;                                                                                                                                       \
+                                                                                                                                                               \
+        if (algo == CMD_HELP) {                                                                                                                                \
+            algo_name = "help";                                                                                                                                \
+        } else if (algo == CMD_MD5) {                                                                                                                          \
+            algo_name = "md5";                                                                                                                                 \
+        } else {                                                                                                                                               \
+            algo_name = "sha256";                                                                                                                              \
+        }                                                                                                                                                      \
+        ft_printf(STDERR_FILENO, "%s: Unknown option for message digest: %s\n%s: Use -help for summary.\n", algo_name, cmd, algo_name);                        \
     }
 
 typedef int (*OptionHandler)(struct Options *const, char **, size_t *);
@@ -134,21 +133,19 @@ add_file(Options *const opts, const char *const arg, bool content) {
     return 0;
 }
 
-static Command
+static Algo *
 get_command(const char *const cmd) {
-    if (!ft_strncmp("md5", (void *)cmd, 4)) {
-        return CMD_MD5;
-    } else if (!ft_strncmp("sha256", (void *)cmd, 7)) {
-        return CMD_SHA256;
-    } else if (!ft_strncmp("help", (void *)cmd, 5)) {
-        return CMD_HELP;
-    } else {
-        return CMD_INVALID;
+    for (Algo *entry = (Algo *)algo_map; entry->hash_func != NULL; ++entry) {
+        if (!ft_strncmp(entry->cmd, cmd, ft_strlen(entry->cmd) + 1)) {
+            return entry;
+        }
     }
+
+    return NULL;
 }
 
 static int
-add_opt(Options *const opts, Command cmd, char **av, size_t *idx) {
+add_opt(Options *const opts, Algo *cmd, char **av, size_t *idx) {
 
     const OptionEntry *entry = option_map;
     while (entry->s != NULL && ft_strncmp(entry->s, av[*idx], 3) && ft_strncmp(entry->l, av[*idx], 10)) {
@@ -156,7 +153,7 @@ add_opt(Options *const opts, Command cmd, char **av, size_t *idx) {
     }
 
     if (entry->s == NULL) {
-        INVALID_OPTION(cmd, av[*idx]);
+        ft_printf(STDERR_FILENO, "%s: Unknown option for message digest: %s\n%s: Use -help for summary.\n", cmd->cmd, av[*idx], cmd->cmd);
         return -1;
     }
 
@@ -187,32 +184,27 @@ options_cleanup(File *head) {
 // Parses through the argument vector and fills `opts` with the resulting options and
 // message paths.
 // Best called with an Options struct allocated in main, on the stack.
-Command
+Algo *
 options_parse(struct Options *const opts, char **av) {
-    Command cmd;
+    Algo *cmd;
 
-    if ((cmd = get_command(av[1])) == CMD_INVALID) {
+    if (!(cmd = get_command(av[1]))) {
         ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", av[1]);
-        return CMD_INVALID;
-    }
-
-    if (cmd == CMD_HELP && av[2]) {
-        INVALID_OPTION(cmd, av[2]);
-        return CMD_INVALID;
+        return NULL;
     }
 
     for (size_t idx = 2; av[idx]; ++idx) {
         if (av[idx][0] == '-') {
             if (add_opt(opts, cmd, av, &idx) == -1) {
-                return -1;
+                return NULL;
             }
         } else if (add_file(opts, av[idx], false) == -1) {
-            return -1;
+            return NULL;
         }
     }
 
     if (opts->targets == NULL && add_file(opts, "stdin", false) == -1) {
-        return -1;
+        return NULL;
     }
 
     return cmd;
