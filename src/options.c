@@ -156,7 +156,6 @@ add_opt(Options *const opts, Command cmd, char **av, size_t *idx) {
     }
 
     if (entry->s == NULL) {
-        options_cleanup(opts->targets);
         INVALID_OPTION(cmd, av[*idx]);
         return -1;
     }
