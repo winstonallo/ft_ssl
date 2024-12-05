@@ -309,7 +309,11 @@ sha256_hash(File *msg, Words *words) {
         words->g += g;
         words->h += h;
     }
-    free(buf.bytes);
+
+    if (msg->reallocated) {
+        free(buf.bytes);
+    }
+
     return 0;
 }
 
