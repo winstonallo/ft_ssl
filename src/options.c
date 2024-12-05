@@ -173,16 +173,16 @@ options_cleanup(File *head) {
 // Best called with an Options struct allocated in main, on the stack.
 Algo *
 options_parse(struct Options *const opts, char **av) {
-    Algo *cmd;
+    Algo *algo;
 
-    if (!(cmd = get_command(av[1]))) {
+    if (!(algo = get_command(av[1]))) {
         ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", av[1]);
         return NULL;
     }
 
     for (size_t idx = 2; av[idx]; ++idx) {
         if (av[idx][0] == '-') {
-            if (add_opt(opts, cmd, av, &idx) == -1) {
+            if (add_opt(opts, algo, av, &idx) == -1) {
                 return NULL;
             }
         } else if (add_file(opts, av[idx], false) == -1) {
@@ -194,5 +194,5 @@ options_parse(struct Options *const opts, char **av) {
         return NULL;
     }
 
-    return cmd;
+    return algo;
 }
