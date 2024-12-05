@@ -33,6 +33,10 @@ main(int ac, char **av) {
     }
 
     for (File *it = opts.targets; it; it = it->next) {
+        if (it->failed) {
+            continue;
+        }
+
         char buf[algo->output_buffer_size];
         algo->hash_func(it, buf);
         display(buf, algo->display_name, it, &opts);

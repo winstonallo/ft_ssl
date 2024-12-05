@@ -14,8 +14,7 @@ file_read(int fd, File *file) {
 
     file->content = ft_calloc(file->allocated_bytes, sizeof(char));
     if (!file->content) {
-        ft_printf(STDERR_FILENO, "could not make initial allocation of %d bytes for `%s`: %s\n", BUFSIZ, file->path,
-                  strerror(errno));
+        ft_printf(STDERR_FILENO, "could not make initial allocation of %d bytes for `%s`: %s\n", BUFSIZ, file->path, strerror(errno));
         return -1;
     }
 
@@ -30,8 +29,7 @@ file_read(int fd, File *file) {
 
             u_int8_t *tmp = buf_realloc(file->content, file->allocated_bytes, total_size);
             if (!tmp) {
-                ft_printf(STDERR_FILENO, "could not reallocate %d bytes for `%s`: %s\n", file->allocated_bytes,
-                          file->path, strerror(errno));
+                ft_printf(STDERR_FILENO, "could not reallocate %d bytes for `%s`: %s\n", file->allocated_bytes, file->path, strerror(errno));
                 return -1;
             }
 
@@ -78,7 +76,9 @@ file_read_all(Options *const opts) {
         int fd = open(head->path, O_RDONLY);
         if (fd == -1) {
             ft_printf(STDERR_FILENO, "open '%s': %s\n", head->path, strerror(errno));
-            return -1;
+            head->failed = true;
+            head = head->next;
+            continue;
         }
 
         if (file_read(fd, head) == -1) {

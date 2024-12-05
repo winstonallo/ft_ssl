@@ -13,6 +13,7 @@ typedef struct File {
     size_t allocated_bytes;
     bool reallocated;
     bool option_s;
+    bool failed;
     struct File *next;
 } File;
 

@@ -10,20 +10,6 @@
 
 static int add_file(Options *const opts, const char *const arg, bool content);
 
-#define INVALID_OPTION(algo, cmd)                                                                                                                              \
-    {                                                                                                                                                          \
-        char *algo_name;                                                                                                                                       \
-                                                                                                                                                               \
-        if (algo == CMD_HELP) {                                                                                                                                \
-            algo_name = "help";                                                                                                                                \
-        } else if (algo == CMD_MD5) {                                                                                                                          \
-            algo_name = "md5";                                                                                                                                 \
-        } else {                                                                                                                                               \
-            algo_name = "sha256";                                                                                                                              \
-        }                                                                                                                                                      \
-        ft_printf(STDERR_FILENO, "%s: Unknown option for message digest: %s\n%s: Use -help for summary.\n", algo_name, cmd, algo_name);                        \
-    }
-
 typedef int (*OptionHandler)(struct Options *const, char **, size_t *);
 
 typedef struct {
@@ -93,13 +79,14 @@ file_new(const char *const path) {
     file->allocated = false;
     file->content = NULL;
     file->option_s = false;
+    file->failed = false;
 
     return file;
 }
 
 static void
 file_add_back(File **head, File *new) {
-    if (!head || !*head) {
+    if (!*head) {
         *head = new;
         return;
     }
