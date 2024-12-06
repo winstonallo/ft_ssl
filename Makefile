@@ -12,7 +12,6 @@ SRCS = 	ssl.c \
 		display/help.c \
 		display/hex.c \
 		display/display.c \
-		bit/rotate.c \
 		messagedigest/sha256.c \
 		messagedigest/md5.c
 
@@ -22,7 +21,7 @@ LIBFT = $(LIBFT_DIR)/libft.a
 LIBFT_FLAGS = -L$(LIBFT_DIR) -lft
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)/src/alloc -I$(LIBFT_DIR)/src/mem -I$(LIBFT_DIR)/src/str -I$(LIBFT_DIR)/src/print
+CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)/src/alloc -I$(LIBFT_DIR)/src/mem -I$(LIBFT_DIR)/src/str -I$(LIBFT_DIR)/src/print -I$(LIBFT_DIR)/src/bit
 LDFLAGS = $(LIBFT_FLAGS) 
 
 all: $(LIBFT) $(NAME)
