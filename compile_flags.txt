@@ -3,6 +3,7 @@
 -Ilibft/src/str
 -Ilibft/src/print
 -Ilibft/src/char
+-Ilibft/src/bit
 -Iinc
 -Wall
 -Wextra
