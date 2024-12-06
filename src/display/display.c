@@ -1,4 +1,5 @@
-#include "libft.h"
+#include "mem.h"
+#include "print.h"
 #include "ssl.h"
 #include <sys/types.h>
 #include <unistd.h>
@@ -10,13 +11,12 @@ display(char *hash, char *algo_name, File *file, const struct Options *const opt
         return;
     }
 
-
     if (file->option_s) {
         char to_print[file->content_size + 1];
 
         ft_memcpy(to_print, file->content, file->content_size);
         to_print[file->content_size] = '\0';
-        
+
         if (opts->r) {
             ft_printf(STDOUT_FILENO, "%s *\"%s\"\n", hash, to_print);
         } else {
@@ -42,6 +42,4 @@ display(char *hash, char *algo_name, File *file, const struct Options *const opt
             ft_printf(STDOUT_FILENO, "%s(%s)= %s\n", algo_name, file->path, hash);
         }
     }
-
-
 }

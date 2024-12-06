@@ -1,0 +1,8 @@
+-Isrc/alloc
+-Isrc/mem
+-Isrc/str
+-Isrc/print
+-Isrc/char
+-Wall
+-Wextra
+-Werror

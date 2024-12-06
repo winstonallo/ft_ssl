@@ -1,5 +1,5 @@
 #include "ssl.h"
-#include "libft.h"
+#include "mem.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,7 +14,7 @@ const Algo algo_map[] = {
 
 int
 main(int ac, char **av) {
-    if (ac < 2 || !ft_strncmp(av[1], "help", 5)) {
+    if (ac < 2 || !ft_memcmp(av[1], "help", 5)) {
         help();
         return EXIT_SUCCESS;
     }

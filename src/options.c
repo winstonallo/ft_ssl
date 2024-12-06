@@ -1,5 +1,7 @@
-#include "libft.h"
+#include "mem.h"
+#include "print.h"
 #include "ssl.h"
+#include "str.h"
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -123,7 +125,7 @@ add_file(Options *const opts, const char *const arg, bool content) {
 static Algo *
 get_command(const char *const cmd) {
     for (Algo *entry = (Algo *)algo_map; entry->hash_func != NULL; ++entry) {
-        if (!ft_strncmp(entry->cmd, cmd, ft_strlen(entry->cmd) + 1)) {
+        if (!ft_memcmp(entry->cmd, cmd, ft_strlen(entry->cmd) + 1)) {
             return entry;
         }
     }
@@ -135,7 +137,7 @@ static int
 add_opt(Options *const opts, Algo *cmd, char **av, size_t *idx) {
 
     const OptionEntry *entry = option_map;
-    while (entry->s != NULL && ft_strncmp(entry->s, av[*idx], 3) && ft_strncmp(entry->l, av[*idx], 10)) {
+    while (entry->s != NULL && ft_memcmp(entry->s, av[*idx], 3) && ft_memcmp(entry->l, av[*idx], 10)) {
         entry++;
     }
 

@@ -1,4 +1,6 @@
-#include "libft.h"
+#include "alloc.h"
+#include "mem.h"
+#include "print.h"
 #include "ssl.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -58,7 +60,7 @@ int
 file_read_all(Options *const opts) {
     File *head = opts->targets;
 
-    if (!ft_strncmp(head->path, "stdin", 6)) {
+    if (!ft_memcmp(head->path, "stdin", 6)) {
         if (file_read(STDIN_FILENO, head) == -1) {
             options_cleanup(opts->targets);
             return -1;
