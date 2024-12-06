@@ -1,5 +1,9 @@
+-Ilibft/src/alloc
+-Ilibft/src/mem
+-Ilibft/src/str
+-Ilibft/src/print
+-Ilibft/src/char
 -Iinc
--I./libft/include
 -Wall
 -Wextra
 -Werror
