@@ -131,8 +131,8 @@ Ir
   734,003,648 ( 2.33%)      return (a & b) ^ (a & c) ^ (b & c);
   209,715,328 ( 0.67%)  }
             .           
-            .           size_t
-            4 ( 0.00%)  calculate_padding(size_t original_size) {
+            .           uint64_t
+            4 ( 0.00%)  calculate_padding(uint64_t original_size) {
             4 ( 0.00%)      if (original_size % 64 > 55) {
             .                   return SHA256_BLOCK_SIZE - ((original_size % SHA256_BLOCK_SIZE) + 1) + 56;
             .               } else {
@@ -270,15 +270,15 @@ Ir
             .                   return -1;
             .               }
             .           
-   14,745,620 ( 0.05%)      for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += SHA256_BLOCK_SIZE) {
+   14,745,620 ( 0.05%)      for (uint8_t *chunk = buf.bytes; (uint64_t)chunk - (uint64_t)buf.bytes < buf.len; chunk += SHA256_BLOCK_SIZE) {
             .           
             .                   uint32_t W[64];
             .           
-   85,196,852 ( 0.27%)          for (size_t t = 0; t < 16; ++t) {
+   85,196,852 ( 0.27%)          for (uint64_t t = 0; t < 16; ++t) {
   235,929,744 ( 0.75%)              W[t] = __builtin_bswap32(((uint32_t *)chunk)[t]);
             .                   }
             .           
-  242,483,348 ( 0.77%)          for (size_t t = 16; t < 64; ++t) {
+  242,483,348 ( 0.77%)          for (uint64_t t = 16; t < 64; ++t) {
 1,651,508,208 ( 5.25%)              W[t] = sig1(W[t - 2]) + W[t - 7] + sig0(W[t - 15]) + W[t - 16];
 3,696,232,656 (11.75%)  => src/sha256.c:sig1 (78,643,248x)
 3,696,232,656 (11.75%)  => src/sha256.c:sig0 (78,643,248x)
@@ -293,7 +293,7 @@ Ir
     4,915,203 ( 0.02%)          uint32_t g = words->g;
     4,915,203 ( 0.02%)          uint32_t h = words->h;
             .           
-  321,126,596 ( 1.02%)          for (size_t t = 0; t < 64; ++t) {
+  321,126,596 ( 1.02%)          for (uint64_t t = 0; t < 64; ++t) {
 2,202,010,944 ( 7.00%)              uint32_t t1 = h + Sig1(e) + Ch(e, f, g) + K[t] + W[t];
 6,291,459,840 (19.99%)  => src/sha256.c:Sig1 (104,857,664x)
 1,572,864,960 ( 5.00%)  => src/sha256.c:Ch (104,857,664x)

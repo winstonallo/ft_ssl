@@ -12,7 +12,7 @@
 
 static int add_file(Options *const opts, const char *const arg, bool content);
 
-typedef int (*OptionHandler)(struct Options *const, char **, size_t *);
+typedef int (*OptionHandler)(struct Options *const, char **, uint64_t *);
 
 typedef struct {
     const char *s;
@@ -21,7 +21,7 @@ typedef struct {
 } OptionEntry;
 
 static int
-add_p(Options *const opts, char **av, size_t *idx) {
+add_p(Options *const opts, char **av, uint64_t *idx) {
     (void)av;
     (void)idx;
     opts->p = true;
@@ -29,7 +29,7 @@ add_p(Options *const opts, char **av, size_t *idx) {
 }
 
 static int
-add_q(Options *const opts, char **av, size_t *idx) {
+add_q(Options *const opts, char **av, uint64_t *idx) {
     (void)av;
     (void)idx;
     opts->q = true;
@@ -37,7 +37,7 @@ add_q(Options *const opts, char **av, size_t *idx) {
 }
 
 static int
-add_r(Options *const opts, char **av, size_t *idx) {
+add_r(Options *const opts, char **av, uint64_t *idx) {
     (void)av;
     (void)idx;
     opts->r = true;
@@ -45,7 +45,7 @@ add_r(Options *const opts, char **av, size_t *idx) {
 }
 
 static int
-add_s(Options *const opts, char **av, size_t *idx) {
+add_s(Options *const opts, char **av, uint64_t *idx) {
 
     if (!av[(*idx) + 1]) {
         ft_printf(STDERR_FILENO, "ft_ssl: -s option needs to be followed by an input string\n");
@@ -134,7 +134,7 @@ get_command(const char *const cmd) {
 }
 
 static int
-add_opt(Options *const opts, Algo *cmd, char **av, size_t *idx) {
+add_opt(Options *const opts, Algo *cmd, char **av, uint64_t *idx) {
 
     const OptionEntry *entry = option_map;
     while (entry->s != NULL && ft_memcmp(entry->s, av[*idx], 3) && ft_memcmp(entry->l, av[*idx], 10)) {
@@ -182,7 +182,7 @@ options_parse(struct Options *const opts, char **av) {
         return NULL;
     }
 
-    for (size_t idx = 2; av[idx]; ++idx) {
+    for (uint64_t idx = 2; av[idx]; ++idx) {
         if (av[idx][0] == '-') {
             if (add_opt(opts, algo, av, &idx) == -1) {
                 return NULL;

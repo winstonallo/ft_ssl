@@ -95,7 +95,7 @@ sha256_pad(File *msg) {
 
     uint64_t padding_size = SHA256_BLOCK_SIZE - ((msg->content_size % SHA256_BLOCK_SIZE) + 1) + ((msg->content_size % 64 > 55) ? 56 : (-8));
 
-    size_t new_size = msg->content_size + padding_size + 1 + 8;
+    uint64_t new_size = msg->content_size + padding_size + 1 + 8;
 
     if (new_size >= msg->allocated_bytes) {
         msg->reallocated = true;
@@ -232,7 +232,7 @@ sha256_hash(File *msg, Words *words) {
         return -1;
     }
 
-    for (uint8_t *chunk = buf.bytes; (size_t)chunk - (size_t)buf.bytes < buf.len; chunk += SHA256_BLOCK_SIZE) {
+    for (uint8_t *chunk = buf.bytes; (uint64_t)chunk - (uint64_t)buf.bytes < buf.len; chunk += SHA256_BLOCK_SIZE) {
 
         uint32_t W[64];
 
@@ -283,7 +283,7 @@ sha256_hash(File *msg, Words *words) {
         // - t is the current iteration's index (0..63)
         // - Σ0(x) = x >>> 2 ⊕ x >>> 13 ⊕ x >>> 22
         // - Maj(a, b, c) = (a ^ b) ⊕ (a ^ c) ⊕ (b ^ c)
-        for (size_t t = 0; t < 64; ++t) {
+        for (uint64_t t = 0; t < 64; ++t) {
             uint32_t t1 = h + Sig1(e) + Ch(e, f, g) + K[t] + W[t];
             uint32_t t2 = Sig0(a) + Maj(a, b, c);
 
