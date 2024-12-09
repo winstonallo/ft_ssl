@@ -8,34 +8,33 @@
 typedef struct File {
     const char *path;
     uint8_t *content;
-    size_t content_size;
+    uint64_t content_size;
+    uint64_t allocated_bytes;
+    struct File *next;
     bool allocated;
-    size_t allocated_bytes;
     bool reallocated;
     bool option_s;
     bool failed;
-    struct File *next;
-} File;
+} File __attribute((aligned(8)));
 
 typedef struct Algo {
     int (*hash_func)(File *, char *);
     char *cmd;
     char *display_name;
     uint8_t output_buffer_size;
-} Algo;
-
-extern const Algo algo_map[];
+} Algo __attribute__((aligned(8)));
 
 typedef struct Message {
     uint8_t *bytes;
-    size_t len;
-} Message;
+    uint64_t len;
+} Message __attribute__((aligned(8)));
+
+extern const Algo algo_map[];
 
 typedef struct Options {
     bool p;
     bool q;
     bool r;
-    bool h;
     File *targets;
 } Options;
 

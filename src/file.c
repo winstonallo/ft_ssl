@@ -11,7 +11,7 @@
 
 static int
 file_read(int fd, File *file) {
-    size_t total_size = 0;
+    uint64_t total_size = 0;
     file->allocated_bytes = BUFSIZ;
 
     file->content = ft_calloc(file->allocated_bytes, sizeof(char));
