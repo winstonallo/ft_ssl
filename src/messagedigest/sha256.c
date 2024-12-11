@@ -28,7 +28,7 @@ static const uint32_t K[] = {0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3
                              0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f,
                              0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
-typedef struct Words {
+struct Words {
     uint32_t a;
     uint32_t b;
     uint32_t c;
@@ -37,24 +37,24 @@ typedef struct Words {
     uint32_t f;
     uint32_t g;
     uint32_t h;
-} Words;
+} __attribute__((aligned(4)));
 
-static uint32_t
+__attribute__((always_inline)) static inline uint32_t
 sig0(uint32_t val) {
     return ROTR_32(val, 7) ^ ROTR_32(val, 18) ^ val >> 3;
 }
 
-static uint32_t
+__attribute__((always_inline)) static inline uint32_t
 sig1(uint32_t val) {
     return ROTR_32(val, 17) ^ ROTR_32(val, 19) ^ val >> 10;
 }
 
-static uint32_t
+__attribute__((always_inline)) static inline uint32_t
 Sig0(uint32_t val) {
     return ROTR_32(val, 2) ^ ROTR_32(val, 13) ^ ROTR_32(val, 22);
 }
 
-static uint32_t
+__attribute__((always_inline)) static inline uint32_t
 Sig1(uint32_t val) {
     return ROTR_32(val, 6) ^ ROTR_32(val, 11) ^ ROTR_32(val, 25);
 }
@@ -67,7 +67,7 @@ Sig1(uint32_t val) {
 //
 // Mathematically, this operation can be expressed as:
 //     `Ch(e, f, g) = (e AND f) XOR ((NOT e) AND g)`
-static uint32_t
+__attribute__((always_inline)) static inline uint32_t
 Ch(uint32_t e, uint32_t f, uint32_t g) {
     return (e & f) ^ (~e & g);
 }
@@ -81,7 +81,7 @@ Ch(uint32_t e, uint32_t f, uint32_t g) {
 //
 // Mathematically, this operation can be expressed as:
 //     `Maj(a, b, c) = (a AND b) XOR (a AND c) XOR (b AND c)`
-static uint32_t
+__attribute__((always_inline)) static inline uint32_t
 Maj(uint32_t a, uint32_t b, uint32_t c) {
     return (a & b) ^ (a & c) ^ (b & c);
 }
@@ -126,7 +126,7 @@ sha256_pad(File *msg) {
 }
 
 static void
-store_to_buf(char *buf, Words words) {
+store_to_buf(char *buf, struct Words words) {
     uint32_t a = words.a;
     uint32_t b = words.b;
     uint32_t c = words.c;
@@ -224,7 +224,7 @@ store_to_buf(char *buf, Words words) {
 }
 
 static int
-sha256_hash(File *msg, Words *words) {
+sha256_hash(File *msg, struct Words *words) {
     (void)words;
 
     Message buf = sha256_pad(msg);
@@ -321,7 +321,7 @@ sha256_hash(File *msg, Words *words) {
 int
 sha256(File *msg, char *buf) {
 
-    Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D, DFLT_E, DFLT_F, DFLT_G, DFLT_H};
+    struct Words words = {DFLT_A, DFLT_B, DFLT_C, DFLT_D, DFLT_E, DFLT_F, DFLT_G, DFLT_H};
     sha256_hash(msg, &words);
 
     store_to_buf(buf, words);
