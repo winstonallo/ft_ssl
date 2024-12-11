@@ -238,14 +238,41 @@ sha256_hash(File *msg, struct Words *words) {
 
         // Here we build the message schedule (W). Each chunk (16 32-bit words) is extended to 64 32-bit words.
         // The first 16 words of the schedule are copied into the schedule.
-        for (uint8_t t = 0; t < 16; ++t) {
-
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-            W[t] = __builtin_bswap32(((uint32_t *)chunk)[t]);
+        W[0] = __builtin_bswap32(((uint32_t *)chunk)[0]);
+        W[1] = __builtin_bswap32(((uint32_t *)chunk)[1]);
+        W[2] = __builtin_bswap32(((uint32_t *)chunk)[2]);
+        W[3] = __builtin_bswap32(((uint32_t *)chunk)[3]);
+        W[4] = __builtin_bswap32(((uint32_t *)chunk)[4]);
+        W[5] = __builtin_bswap32(((uint32_t *)chunk)[5]);
+        W[6] = __builtin_bswap32(((uint32_t *)chunk)[6]);
+        W[7] = __builtin_bswap32(((uint32_t *)chunk)[7]);
+        W[8] = __builtin_bswap32(((uint32_t *)chunk)[8]);
+        W[9] = __builtin_bswap32(((uint32_t *)chunk)[9]);
+        W[10] = __builtin_bswap32(((uint32_t *)chunk)[10]);
+        W[11] = __builtin_bswap32(((uint32_t *)chunk)[11]);
+        W[12] = __builtin_bswap32(((uint32_t *)chunk)[12]);
+        W[13] = __builtin_bswap32(((uint32_t *)chunk)[13]);
+        W[14] = __builtin_bswap32(((uint32_t *)chunk)[14]);
+        W[15] = __builtin_bswap32(((uint32_t *)chunk)[15]);
 #else
-            W[t] = ((uint32_t *)chunk)[t];
+        W[0] = ((uint32_t *)chunk)[0];
+        W[1] = ((uint32_t *)chunk)[1];
+        W[2] = ((uint32_t *)chunk)[2];
+        W[3] = ((uint32_t *)chunk)[3];
+        W[4] = ((uint32_t *)chunk)[4];
+        W[5] = ((uint32_t *)chunk)[5];
+        W[6] = ((uint32_t *)chunk)[6];
+        W[7] = ((uint32_t *)chunk)[7];
+        W[8] = ((uint32_t *)chunk)[8];
+        W[9] = ((uint32_t *)chunk)[9];
+        W[10] = ((uint32_t *)chunk)[10];
+        W[11] = ((uint32_t *)chunk)[11];
+        W[12] = ((uint32_t *)chunk)[12];
+        W[13] = ((uint32_t *)chunk)[13];
+        W[14] = ((uint32_t *)chunk)[14];
+        W[15] = ((uint32_t *)chunk)[15];
 #endif
-        }
 
         // The next 48 words are calculated with this formula:
         // `W(t) = 𝜎1(W(t - 2)) + W(t - 7) + 𝜎0(W(t - 15)) + W(t - 16)`,
@@ -255,9 +282,54 @@ sha256_hash(File *msg, struct Words *words) {
         // - 𝜎1(x) = x >>> 17 ⊕ x >>> 19 ⊕ x >> 10
         // Note that every addition is made % 2^32 - using any other type than u32 would result
         // in wrong calculations.
-        for (uint8_t t = 16; t < 64; ++t) {
-            W[t] = sig1(W[t - 2]) + W[t - 7] + sig0(W[t - 15]) + W[t - 16];
-        }
+        W[16] = sig1(W[14]) + W[9] + sig0(W[1]) + W[0];
+        W[17] = sig1(W[15]) + W[10] + sig0(W[2]) + W[1];
+        W[18] = sig1(W[16]) + W[11] + sig0(W[3]) + W[2];
+        W[19] = sig1(W[17]) + W[12] + sig0(W[4]) + W[3];
+        W[20] = sig1(W[18]) + W[13] + sig0(W[5]) + W[4];
+        W[21] = sig1(W[19]) + W[14] + sig0(W[6]) + W[5];
+        W[22] = sig1(W[20]) + W[15] + sig0(W[7]) + W[6];
+        W[23] = sig1(W[21]) + W[16] + sig0(W[8]) + W[7];
+        W[24] = sig1(W[22]) + W[17] + sig0(W[9]) + W[8];
+        W[25] = sig1(W[23]) + W[18] + sig0(W[10]) + W[9];
+        W[26] = sig1(W[24]) + W[19] + sig0(W[11]) + W[10];
+        W[27] = sig1(W[25]) + W[20] + sig0(W[12]) + W[11];
+        W[28] = sig1(W[26]) + W[21] + sig0(W[13]) + W[12];
+        W[29] = sig1(W[27]) + W[22] + sig0(W[14]) + W[13];
+        W[30] = sig1(W[28]) + W[23] + sig0(W[15]) + W[14];
+        W[31] = sig1(W[29]) + W[24] + sig0(W[16]) + W[15];
+        W[32] = sig1(W[30]) + W[25] + sig0(W[17]) + W[16];
+        W[33] = sig1(W[31]) + W[26] + sig0(W[18]) + W[17];
+        W[34] = sig1(W[32]) + W[27] + sig0(W[19]) + W[18];
+        W[35] = sig1(W[33]) + W[28] + sig0(W[20]) + W[19];
+        W[36] = sig1(W[34]) + W[29] + sig0(W[21]) + W[20];
+        W[37] = sig1(W[35]) + W[30] + sig0(W[22]) + W[21];
+        W[38] = sig1(W[36]) + W[31] + sig0(W[23]) + W[22];
+        W[39] = sig1(W[37]) + W[32] + sig0(W[24]) + W[23];
+        W[40] = sig1(W[38]) + W[33] + sig0(W[25]) + W[24];
+        W[41] = sig1(W[39]) + W[34] + sig0(W[26]) + W[25];
+        W[42] = sig1(W[40]) + W[35] + sig0(W[27]) + W[26];
+        W[43] = sig1(W[41]) + W[36] + sig0(W[28]) + W[27];
+        W[44] = sig1(W[42]) + W[37] + sig0(W[29]) + W[28];
+        W[45] = sig1(W[43]) + W[38] + sig0(W[30]) + W[29];
+        W[46] = sig1(W[44]) + W[39] + sig0(W[31]) + W[30];
+        W[47] = sig1(W[45]) + W[40] + sig0(W[32]) + W[31];
+        W[48] = sig1(W[46]) + W[41] + sig0(W[33]) + W[32];
+        W[49] = sig1(W[47]) + W[42] + sig0(W[34]) + W[33];
+        W[50] = sig1(W[48]) + W[43] + sig0(W[35]) + W[34];
+        W[51] = sig1(W[49]) + W[44] + sig0(W[36]) + W[35];
+        W[52] = sig1(W[50]) + W[45] + sig0(W[37]) + W[36];
+        W[53] = sig1(W[51]) + W[46] + sig0(W[38]) + W[37];
+        W[54] = sig1(W[52]) + W[47] + sig0(W[39]) + W[38];
+        W[55] = sig1(W[53]) + W[48] + sig0(W[40]) + W[39];
+        W[56] = sig1(W[54]) + W[49] + sig0(W[41]) + W[40];
+        W[57] = sig1(W[55]) + W[50] + sig0(W[42]) + W[41];
+        W[58] = sig1(W[56]) + W[51] + sig0(W[43]) + W[42];
+        W[59] = sig1(W[57]) + W[52] + sig0(W[44]) + W[43];
+        W[60] = sig1(W[58]) + W[53] + sig0(W[45]) + W[44];
+        W[61] = sig1(W[59]) + W[54] + sig0(W[46]) + W[45];
+        W[62] = sig1(W[60]) + W[55] + sig0(W[47]) + W[46];
+        W[63] = sig1(W[61]) + W[56] + sig0(W[48]) + W[47];
 
         uint32_t a = words->a;
         uint32_t b = words->b;

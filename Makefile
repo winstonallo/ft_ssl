@@ -35,7 +35,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_DIR)/ssl.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)/bit
 	mkdir -p $(OBJ_DIR)/messagedigest
 	mkdir -p $(OBJ_DIR)/display
 
@@ -51,6 +50,7 @@ re: fclean all
 
 prof:
 	FILE_NAME="/tmp/.out" ./tests/generate_random_file.sh
+	make fclean
 	make CFLAGS="${CFLAGS} -pg -g"
 	valgrind --tool=callgrind ./ft_ssl ${ALGO} /tmp/.out
 	callgrind_annotate callgrind.out.* > ${OUTFILE}
