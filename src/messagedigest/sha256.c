@@ -41,22 +41,22 @@ typedef struct Words {
 
 static uint32_t
 sig0(uint32_t val) {
-    return rotr_32(val, 7) ^ rotr_32(val, 18) ^ val >> 3;
+    return ROTR_32(val, 7) ^ ROTR_32(val, 18) ^ val >> 3;
 }
 
 static uint32_t
 sig1(uint32_t val) {
-    return rotr_32(val, 17) ^ rotr_32(val, 19) ^ val >> 10;
+    return ROTR_32(val, 17) ^ ROTR_32(val, 19) ^ val >> 10;
 }
 
 static uint32_t
 Sig0(uint32_t val) {
-    return rotr_32(val, 2) ^ rotr_32(val, 13) ^ rotr_32(val, 22);
+    return ROTR_32(val, 2) ^ ROTR_32(val, 13) ^ ROTR_32(val, 22);
 }
 
 static uint32_t
 Sig1(uint32_t val) {
-    return rotr_32(val, 6) ^ rotr_32(val, 11) ^ rotr_32(val, 25);
+    return ROTR_32(val, 6) ^ ROTR_32(val, 11) ^ ROTR_32(val, 25);
 }
 
 // `Ch` (choose/choice) selects bits from two input values `f` and `g` based on a selector `e`.
