@@ -7,3 +7,4 @@ libft.a
 *.out
 *_test
 testcase
+callgrind.out.*

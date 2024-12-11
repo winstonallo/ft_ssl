@@ -53,11 +53,11 @@ prof:
 	FILE_NAME="/tmp/.out" ./tests/generate_random_file.sh
 	make CFLAGS="${CFLAGS} -pg -g"
 	valgrind --tool=callgrind ./ft_ssl ${ALGO} /tmp/.out
-	callgrind_annotate callgrind.out.* >> ${OUTFILE}
+	callgrind_annotate callgrind.out.* > ${OUTFILE}
 	rm callgrind.out.* gmon.out
 
-debug:
-	make CFLAGS="${CFLAGS} -g"
+debug: CFLAGS = -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror -g -I$(INC_DIR) -I$(LIBFT_DIR)/src/alloc -I$(LIBFT_DIR)/src/mem -I$(LIBFT_DIR)/src/str -I$(LIBFT_DIR)/src/print -I$(LIBFT_DIR)/src/bit
+debug: all
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
