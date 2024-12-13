@@ -84,9 +84,11 @@ file_read_all(Options *const opts) {
         }
 
         if (file_read(fd, head) == -1) {
+            close(fd);
             return -1;
         }
-
+        
+        close(fd);
         head = head->next;
     }
 
