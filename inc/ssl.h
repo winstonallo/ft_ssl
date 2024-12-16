@@ -12,6 +12,8 @@ typedef struct File {
     uint64_t allocated_bytes;
     struct File *next;
 
+    // Bitset for storing flags, saves 24 bytes, enabling the struct
+    // to fit on a single cache line.
     uint8_t flags;
 
 #define allocated flags & 0x01
@@ -33,12 +35,12 @@ typedef struct Algo {
     char *cmd;
     char *display_name;
     uint8_t output_buffer_size;
-} Algo __attribute__((aligned(8)));
+} Algo;
 
 typedef struct Message {
     uint8_t *bytes;
     uint64_t len;
-} Message __attribute__((aligned(8)));
+} Message;
 
 extern const Algo algo_map[];
 
@@ -48,13 +50,6 @@ typedef struct Options {
     bool r;
     File *targets;
 } Options;
-
-typedef enum Command {
-    CMD_INVALID = -1,
-    CMD_MD5 = 0,
-    CMD_SHA256 = 1,
-    CMD_HELP = 2,
-} Command;
 
 // md5.c
 int md5(File *msg, char *buf);
