@@ -23,7 +23,7 @@ LIBFT = $(LIBFT_DIR)/libft.a
 LIBFT_FLAGS = -L$(LIBFT_DIR) -lft
 
 CC = cc
-CFLAGS = -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)/src/alloc -I$(LIBFT_DIR)/src/mem -I$(LIBFT_DIR)/src/str -I$(LIBFT_DIR)/src/print -I$(LIBFT_DIR)/src/bit
+CFLAGS = -O3 -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)/src/alloc -I$(LIBFT_DIR)/src/mem -I$(LIBFT_DIR)/src/str -I$(LIBFT_DIR)/src/print -I$(LIBFT_DIR)/src/bit
 LDFLAGS = $(LIBFT_FLAGS) 
 
 all: $(LIBFT) $(NAME)
