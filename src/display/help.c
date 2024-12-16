@@ -12,7 +12,7 @@
     "Message Digest commands\n"                                                                                                                                \
     "md5               sha256\n\0"
 
-void
+int
 help() {
-    write(STDERR_FILENO, HELP, ft_strlen(HELP));
+    return write(STDERR_FILENO, HELP, ft_strlen(HELP));
 }
