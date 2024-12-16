@@ -95,13 +95,11 @@ sha256_pad(File *msg) {
     buf.bytes[msg->content_size] = (char)0x80;
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-    uint32_t length_bits = (uint32_t)(msg->content_size * 8);
-    *(uint32_t *)(&buf.bytes[new_size - 8]) = 0;
-    *(uint32_t *)(&buf.bytes[new_size - 4]) = BSWAP_32(length_bits);
+    uint64_t length_bits = (uint64_t)(msg->content_size * 8);
+    *(uint64_t *)(&buf.bytes[new_size - 8]) = BSWAP_64(length_bits);
 #else
-    uint32_t length_bits = (uint32_t)(msg->content_size * 8);
-    *(uint32_t *)(&buf.bytes[new_size - 8]) = 0;
-    *(uint32_t *)(&buf.bytes[new_size - 4]) = length_bits;
+    uint64_t length_bits = (uint64_t)(msg->content_size * 8);
+    *(uint64_t *)(&buf.bytes[new_size - 8]) = length_bits;
 #endif
 
     buf.len = new_size;
