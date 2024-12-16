@@ -77,11 +77,8 @@ file_new(const char *const path) {
     file->next = NULL;
     file->allocated_bytes = 0;
     file->content_size = 0;
-    file->reallocated = false;
-    file->allocated = false;
+    file->flags = 0;
     file->content = NULL;
-    file->option_s = false;
-    file->failed = false;
 
     return file;
 }
@@ -113,7 +110,7 @@ add_file(Options *const opts, const char *const arg, bool content) {
     }
 
     if (content) {
-        new->option_s = true;
+        new->set_option_s;
         new->content_size = ft_strlen(arg);
         new->content = (uint8_t *)arg;
     }
@@ -151,9 +148,6 @@ add_opt(Options *const opts, Algo *cmd, char **av, uint64_t *idx) {
 
 // Cleans up all heap memory allocated for dynamic content (as of now only message
 // buffers and their linked list pointers).
-// Safety:
-// - This does not clean up the Options struct, as it is assumed to be stack
-// allocated.
 void
 options_cleanup(File *head) {
     File *prev;

@@ -11,11 +11,22 @@ typedef struct File {
     uint64_t content_size;
     uint64_t allocated_bytes;
     struct File *next;
-    bool allocated;
-    bool reallocated;
-    bool option_s;
-    bool failed;
-} File __attribute((aligned(8)));
+
+    uint8_t flags;
+
+#define allocated flags & 0x01
+#define set_allocated flags |= 0x01
+
+#define option_s flags & 0x02
+#define set_option_s flags |= 0x02
+
+#define reallocated flags & 0x04
+#define set_reallocated flags |= 0x04
+
+#define failed flags & 0x08
+#define set_failed flags |= 0x08
+
+} File;
 
 typedef struct Algo {
     int (*hash_func)(File *, char *);

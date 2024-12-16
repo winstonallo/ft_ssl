@@ -20,7 +20,7 @@ file_read(int fd, File *file) {
         return -1;
     }
 
-    file->allocated = true;
+    file->set_allocated;
 
     ssize_t bytes_read;
     while ((bytes_read = read(fd, file->content + total_size, file->allocated_bytes - total_size)) > 0) {
@@ -78,7 +78,7 @@ file_read_all(Options *const opts) {
         int fd = open(head->path, O_RDONLY);
         if (fd == -1) {
             ft_printf(STDERR_FILENO, "open '%s': %s\n", head->path, strerror(errno));
-            head->failed = true;
+            head->set_failed;
             head = head->next;
             continue;
         }
@@ -87,7 +87,7 @@ file_read_all(Options *const opts) {
             close(fd);
             return -1;
         }
-        
+
         close(fd);
         head = head->next;
     }
