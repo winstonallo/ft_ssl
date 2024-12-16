@@ -39,25 +39,11 @@ struct Words {
     uint32_t h;
 } __attribute__((aligned(4)));
 
-__attribute__((always_inline)) static inline uint32_t
-sig0(uint32_t val) {
-    return ROTR_32(val, 7) ^ ROTR_32(val, 18) ^ val >> 3;
-}
+#define sig0(val) (ROTR_32(val, 7) ^ ROTR_32(val, 18) ^ val >> 3)
+#define sig1(val) (ROTR_32(val, 17) ^ ROTR_32(val, 19) ^ val >> 10)
 
-__attribute__((always_inline)) static inline uint32_t
-sig1(uint32_t val) {
-    return ROTR_32(val, 17) ^ ROTR_32(val, 19) ^ val >> 10;
-}
-
-__attribute__((always_inline)) static inline uint32_t
-Sig0(uint32_t val) {
-    return ROTR_32(val, 2) ^ ROTR_32(val, 13) ^ ROTR_32(val, 22);
-}
-
-__attribute__((always_inline)) static inline uint32_t
-Sig1(uint32_t val) {
-    return ROTR_32(val, 6) ^ ROTR_32(val, 11) ^ ROTR_32(val, 25);
-}
+#define Sig0(val) (ROTR_32(val, 2) ^ ROTR_32(val, 13) ^ ROTR_32(val, 22))
+#define Sig1(val) (ROTR_32(val, 6) ^ ROTR_32(val, 11) ^ ROTR_32(val, 25))
 
 // `Ch` (choose/choice) selects bits from two input values `f` and `g` based on a selector `e`.
 //
@@ -67,10 +53,7 @@ Sig1(uint32_t val) {
 //
 // Mathematically, this operation can be expressed as:
 //     `Ch(e, f, g) = (e AND f) XOR ((NOT e) AND g)`
-__attribute__((always_inline)) static inline uint32_t
-Ch(uint32_t e, uint32_t f, uint32_t g) {
-    return (e & f) ^ (~e & g);
-}
+#define Ch(e, f, g) ((e & f) ^ (~e & g))
 
 // `Maj` (majority) chooses each bit of the result `ret` based on the majority value
 // of the corresponding bits in three input values `a`, `b`, and `c`.
@@ -81,10 +64,7 @@ Ch(uint32_t e, uint32_t f, uint32_t g) {
 //
 // Mathematically, this operation can be expressed as:
 //     `Maj(a, b, c) = (a AND b) XOR (a AND c) XOR (b AND c)`
-__attribute__((always_inline)) static inline uint32_t
-Maj(uint32_t a, uint32_t b, uint32_t c) {
-    return (a & b) ^ (a & c) ^ (b & c);
-}
+#define Maj(a, b, c) ((a & b) ^ (a & c) ^ (b & c))
 
 // When padding the message, we append a single `1` bit to the message, followed by `k` `0` bits such
 // that where `k` is the minimum number `>= 0` such that `(L + 1 + k + 64) % 512 == 0` holds true.
@@ -115,9 +95,13 @@ sha256_pad(File *msg) {
     buf.bytes[msg->content_size] = (char)0x80;
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-    *(uint64_t *)(&buf.bytes[new_size - 8]) = (uint64_t)__builtin_bswap64(msg->content_size * 8);
+    uint32_t length_bits = (uint32_t)(msg->content_size * 8);
+    *(uint32_t *)(&buf.bytes[new_size - 8]) = 0;
+    *(uint32_t *)(&buf.bytes[new_size - 4]) = BSWAP_32(length_bits);
 #else
-    *(uint64_t *)(&buf.bytes[new_size - 8]) = (uint64_t)msg->content_size * 8;
+    uint32_t length_bits = (uint32_t)(msg->content_size * 8);
+    *(uint32_t *)(&buf.bytes[new_size - 8]) = 0;
+    *(uint32_t *)(&buf.bytes[new_size - 4]) = length_bits;
 #endif
 
     buf.len = new_size;
@@ -239,22 +223,22 @@ sha256_hash(File *msg, struct Words *words) {
         // Here we build the message schedule (W). Each chunk (16 32-bit words) is extended to 64 32-bit words.
         // The first 16 words of the schedule are copied into the schedule.
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-        W[0] = __builtin_bswap32(((uint32_t *)chunk)[0]);
-        W[1] = __builtin_bswap32(((uint32_t *)chunk)[1]);
-        W[2] = __builtin_bswap32(((uint32_t *)chunk)[2]);
-        W[3] = __builtin_bswap32(((uint32_t *)chunk)[3]);
-        W[4] = __builtin_bswap32(((uint32_t *)chunk)[4]);
-        W[5] = __builtin_bswap32(((uint32_t *)chunk)[5]);
-        W[6] = __builtin_bswap32(((uint32_t *)chunk)[6]);
-        W[7] = __builtin_bswap32(((uint32_t *)chunk)[7]);
-        W[8] = __builtin_bswap32(((uint32_t *)chunk)[8]);
-        W[9] = __builtin_bswap32(((uint32_t *)chunk)[9]);
-        W[10] = __builtin_bswap32(((uint32_t *)chunk)[10]);
-        W[11] = __builtin_bswap32(((uint32_t *)chunk)[11]);
-        W[12] = __builtin_bswap32(((uint32_t *)chunk)[12]);
-        W[13] = __builtin_bswap32(((uint32_t *)chunk)[13]);
-        W[14] = __builtin_bswap32(((uint32_t *)chunk)[14]);
-        W[15] = __builtin_bswap32(((uint32_t *)chunk)[15]);
+        W[0] = BSWAP_32(((uint32_t *)chunk)[0]);
+        W[1] = BSWAP_32(((uint32_t *)chunk)[1]);
+        W[2] = BSWAP_32(((uint32_t *)chunk)[2]);
+        W[3] = BSWAP_32(((uint32_t *)chunk)[3]);
+        W[4] = BSWAP_32(((uint32_t *)chunk)[4]);
+        W[5] = BSWAP_32(((uint32_t *)chunk)[5]);
+        W[6] = BSWAP_32(((uint32_t *)chunk)[6]);
+        W[7] = BSWAP_32(((uint32_t *)chunk)[7]);
+        W[8] = BSWAP_32(((uint32_t *)chunk)[8]);
+        W[9] = BSWAP_32(((uint32_t *)chunk)[9]);
+        W[10] = BSWAP_32(((uint32_t *)chunk)[10]);
+        W[11] = BSWAP_32(((uint32_t *)chunk)[11]);
+        W[12] = BSWAP_32(((uint32_t *)chunk)[12]);
+        W[13] = BSWAP_32(((uint32_t *)chunk)[13]);
+        W[14] = BSWAP_32(((uint32_t *)chunk)[14]);
+        W[15] = BSWAP_32(((uint32_t *)chunk)[15]);
 #else
         W[0] = ((uint32_t *)chunk)[0];
         W[1] = ((uint32_t *)chunk)[1];
