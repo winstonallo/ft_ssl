@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE_SIZE=100
+FILE_SIZE=1000
 
 echo "Generating a $FILE_SIZE MB file with random data: $FILE_NAME"
 dd if=/dev/urandom of="$FILE_NAME" bs=1M count="$FILE_SIZE" status=progress
