@@ -92,7 +92,7 @@ sha256_pad(File *msg) {
         free(msg->content);
     }
 
-    buf.bytes[msg->content_size] = (uint64_t)0x80;
+    buf.bytes[msg->content_size] = (uint8_t)0x80;
 
     uint64_t length_bits = (uint64_t)(msg->content_size * 8);
 
