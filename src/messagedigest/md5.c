@@ -75,7 +75,7 @@ md5_pad(File *msg) {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
     *(uint64_t *)(&buf.bytes[new_size - 8]) = msg->content_size * 8;
 #else
-    *(uint64_t *)(&buf.bytes[new_size - 8]) = __builtin_bswap64(msg->content_size * 8);
+    *(uint64_t *)(&buf.bytes[new_size - 8]) = BSWAP_64(msg->content_size * 8);
 #endif
 
     buf.len = new_size;
