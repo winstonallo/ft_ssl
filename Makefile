@@ -5,7 +5,7 @@ SRC_DIR = src
 INC_DIR = inc
 LIBFT_DIR = libft
 
-BLOCK_SIZE=$(stat -fc %s .)
+BLOCK_SIZE=$(shell stat -fc %s .)
 
 SRCS = 	ssl.c \
 		options.c \
@@ -19,19 +19,28 @@ SRCS = 	ssl.c \
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 
+HEADERS = $(wildcard $(INC_DIR)/*.h) $(wildcard $(LIBFT_DIR)/src/**/*.h)
+
 LIBFT = $(LIBFT_DIR)/libft.a
 LIBFT_FLAGS = -L$(LIBFT_DIR) -lft
 
 CC = cc
-CFLAGS = -O3 -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)/src/alloc -I$(LIBFT_DIR)/src/mem -I$(LIBFT_DIR)/src/str -I$(LIBFT_DIR)/src/print -I$(LIBFT_DIR)/src/bit
+CFLAGS = -O3 -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror \
+	-I$(INC_DIR) \
+	-I$(LIBFT_DIR)/src/alloc \
+	-I$(LIBFT_DIR)/src/mem \
+	-I$(LIBFT_DIR)/src/str \
+	-I$(LIBFT_DIR)/src/print \
+	-I$(LIBFT_DIR)/src/bit
 LDFLAGS = $(LIBFT_FLAGS) 
 
 all: $(LIBFT) $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(LIBFT)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_DIR)/ssl.h | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS) | $(OBJ_DIR)
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
@@ -56,10 +65,16 @@ prof:
 	callgrind_annotate callgrind.out.* > ${OUTFILE}
 	rm callgrind.out.* gmon.out
 
-debug: CFLAGS = -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror -g -I$(INC_DIR) -I$(LIBFT_DIR)/src/alloc -I$(LIBFT_DIR)/src/mem -I$(LIBFT_DIR)/src/str -I$(LIBFT_DIR)/src/print -I$(LIBFT_DIR)/src/bit
+debug: CFLAGS = -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror -g \
+	-I$(INC_DIR) \
+	-I$(LIBFT_DIR)/src/alloc \
+	-I$(LIBFT_DIR)/src/mem \
+	-I$(LIBFT_DIR)/src/str \
+	-I$(LIBFT_DIR)/src/print \
+	-I$(LIBFT_DIR)/src/bit
 debug: all
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re prof debug
