@@ -66,8 +66,8 @@ struct Words {
 //     `Maj(a, b, c) = (a AND b) XOR (a AND c) XOR (b AND c)`
 #define Maj(a, b, c) ((a & b) ^ (a & c) ^ (b & c))
 
-// When padding the message, we append a single `1` bit to the message, followed by `k` `0` bits such
-// that where `k` is the minimum number `>= 0` such that `(L + 1 + k + 64) % 512 == 0` holds true.
+// When padding the message, we append a single `1` bit to the message, followed by `k` `0` bits 
+// where `k` is the minimum number `>= 0` such that `(L + 1 + k + 64) % 512 == 0` holds true.
 // Finally, we append the original length of the message in bits as a big-endian 64-bit integer.
 static Message
 sha256_pad(File *msg) {
