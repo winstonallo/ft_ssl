@@ -44,10 +44,10 @@ file_read(int fd, File *file) {
         return -1;
     }
 
-    // This is a monkey patch, since optimizing `buf_realloc` to use `malloc` instead of `ft_calloc`,
+    // Since optimizing `buf_realloc` to use `malloc` instead of `ft_calloc`,
     // there has been some uninitialized value issue when constructing the hash output (not influencing
     // the functionality, but better be safe).
-    // It ensures that the next 512 bytes after the total size of the message are initialized. I do not
+    // This ensures that the next 512 bytes after the total size of the message are initialized. I do not
     // go back to `ft_calloc` because removing it resulted in a ~25% speed increase.
     ft_memset(file->content + total_size, 0, 512);
 
