@@ -21,7 +21,7 @@ main(int ac, char **av) {
 
     struct Options opts = {0};
 
-    Algo *algo = options_parse(&opts, av);
+    Algo *algo = options_parse(algo_map, &opts, av);
     if (!algo) {
         options_cleanup(opts.targets);
         return EXIT_FAILURE;

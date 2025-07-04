@@ -120,7 +120,7 @@ add_file(Options *const opts, const char *const arg, bool content) {
 }
 
 static Algo *
-get_command(const char *const cmd) {
+get_command(const Algo *const algo_map, const char *const cmd) {
     for (Algo *entry = (Algo *)algo_map; entry->f != NULL; ++entry) {
         if (!ft_memcmp(entry->cmd, cmd, ft_strlen(entry->cmd) + 1)) {
             return entry;
@@ -167,10 +167,10 @@ options_cleanup(File *head) {
 // Parses through the argument vector and fills `opts` with the resulting options and
 // message paths.
 Algo *
-options_parse(struct Options *const opts, char **av) {
+options_parse(const Algo *const algo_map, struct Options *const opts, char **av) {
     Algo *algo;
 
-    if (!(algo = get_command(av[1]))) {
+    if (!(algo = get_command(algo_map, av[1]))) {
         ft_printf(STDERR_FILENO, "Invalid command: '%s'; type \"./ft_ssl help\" for a list.\n", av[1]);
         return NULL;
     }
