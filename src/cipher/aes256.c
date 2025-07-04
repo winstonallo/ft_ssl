@@ -1,5 +1,5 @@
 #include "aes.h"
-#include "utils.h"
+#include "mem.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -203,7 +203,7 @@ __CopyState(uint8_t in[16], uint8_t out[16]) {
 }
 
 // Nr = 14 for AES-256
-__attribute__((always_inline)) static inline uint8_t *
+uint8_t *
 Cipher(const uint8_t *in, uint8_t *const out, uint32_t *w) {
     uint8_t *const state = out;
     __CopyState((uint8_t *)in, out);
@@ -224,7 +224,7 @@ Cipher(const uint8_t *in, uint8_t *const out, uint32_t *w) {
     return state;
 }
 
-__attribute__((always_inline)) static inline uint32_t *
+uint32_t *
 KeyExpansion(const uint8_t key[32], uint32_t *const out) {
     uint32_t *const w = out;
 
@@ -244,7 +244,7 @@ KeyExpansion(const uint8_t key[32], uint32_t *const out) {
     return w;
 }
 
-__attribute__((always_inline)) static inline uint8_t *
+uint8_t *
 InvCipher(uint8_t *in, uint8_t *const out, uint32_t *w) {
     uint8_t *const state = out;
     __CopyState((uint8_t *)in, out);
@@ -265,8 +265,13 @@ InvCipher(uint8_t *in, uint8_t *const out, uint32_t *w) {
     return state;
 }
 
-#define AES256_BLOCK_SIZE_BYTES 16
-#define AES256_EXPANDED_KEY_SIZE_U32 (4 * (14 + 1))
+void
+AES256_Init(Aes256Data *data, const uint8_t key[AES256_KEY_SIZE_BYTES], const uint8_t *const msg, const size_t msg_len) {
+    KeyExpansion(key, data->expanded_key);
+    ft_memcpy(data->key, key, AES256_KEY_SIZE_BYTES);
+    data->msg.data = (uint8_t *)msg;
+    data->msg.len = msg_len;
+}
 
 Aes256Data *
 Aes256_ECB_Encrypt(Aes256Data *data) {
@@ -278,7 +283,7 @@ Aes256_ECB_Encrypt(Aes256Data *data) {
     uint32_t w[AES256_EXPANDED_KEY_SIZE_U32];
     KeyExpansion(data->key, w);
 
-    for (int block_idx = 0; block_idx < blocks; ++block_idx) {
+    for (size_t block_idx = 0; block_idx < blocks; ++block_idx) {
         uint8_t buf[16] = {0};
 
         Cipher(&data->msg.data[block_idx * 16], buf, w);
@@ -298,7 +303,7 @@ Aes256_ECB_Decrypt(Aes256Data *data) {
     uint32_t w[AES256_EXPANDED_KEY_SIZE_U32];
     KeyExpansion(data->key, w);
 
-    for (int block_idx = 0; block_idx < blocks; ++block_idx) {
+    for (size_t block_idx = 0; block_idx < blocks; ++block_idx) {
         uint8_t buf[16] = {0};
 
         InvCipher(&data->msg.data[block_idx * 16], buf, w);
@@ -308,7 +313,9 @@ Aes256_ECB_Decrypt(Aes256Data *data) {
     return data;
 }
 
+#ifndef TEST
 #define TEST 1
+#endif
 #if TEST == 1
 #include <assert.h>
 #include <stdio.h>
@@ -333,7 +340,7 @@ main() {
     const uint8_t test_key[32] = {0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe, 0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
                                   0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, 0xd7, 0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf, 0xf4};
 
-    uint32_t w[(4 * (14 + 1)) * sizeof(uint32_t)] = {0};
+    uint32_t w[AES256_EXPANDED_KEY_SIZE_U32] = {0};
     KeyExpansion(test_key, w);
 
     assert(w[0] == 0x603deb10);
@@ -343,8 +350,8 @@ main() {
 
     const uint8_t plaintext[22] = "Hello, World!!\nArthur";
 
-    uint8_t enc[128 / 8] = {0};
-    Aes256Data data = {.msg.data = (uint8_t *)plaintext, .msg.len = sizeof(plaintext), .key = (uint8_t *)test_key};
+    Aes256Data data = {.msg.data = (uint8_t *)plaintext, .msg.len = sizeof(plaintext)};
+
     Aes256_ECB_Encrypt(&data);
 
     Aes256_ECB_Decrypt(&data);
