@@ -31,7 +31,7 @@ typedef struct File {
 } File;
 
 typedef struct Algo {
-    int (*hash_func)(File *, char *);
+    int (*f)(File *, char *);
     char *cmd;
     char *display_name;
     uint8_t output_buffer_size;
