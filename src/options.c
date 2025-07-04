@@ -121,7 +121,7 @@ add_file(Options *const opts, const char *const arg, bool content) {
 
 static Algo *
 get_command(const char *const cmd) {
-    for (Algo *entry = (Algo *)algo_map; entry->hash_func != NULL; ++entry) {
+    for (Algo *entry = (Algo *)algo_map; entry->f != NULL; ++entry) {
         if (!ft_memcmp(entry->cmd, cmd, ft_strlen(entry->cmd) + 1)) {
             return entry;
         }
@@ -166,7 +166,6 @@ options_cleanup(File *head) {
 
 // Parses through the argument vector and fills `opts` with the resulting options and
 // message paths.
-// Best called with an Options struct allocated in main, on the stack.
 Algo *
 options_parse(struct Options *const opts, char **av) {
     Algo *algo;

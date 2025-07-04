@@ -39,7 +39,7 @@ main(int ac, char **av) {
 
         char buf[algo->output_buffer_size];
 
-        if (algo->hash_func(it, buf) == -1) {
+        if (algo->f(it, buf) == -1) {
             continue;
         }
 
