@@ -109,11 +109,8 @@ GCTR(const U128 *const restrict ICB, const Aes256Data *const X, Aes256Data *cons
     Y->msg.len = X->msg.len;
 }
 
-#define TEST 2
-#if TEST == 2
-
 bool
-GCTR_TestCase13() {
+GCTR_test_empty_input_returns_empty_cipher() {
     uint8_t key[32] = {0};
     uint8_t plaintext[1] = {0};
     U128 ICB = {.hi = 0x0000000000000000ULL, .lo = 0x0100000000000000ULL};
@@ -126,7 +123,7 @@ GCTR_TestCase13() {
 }
 
 bool
-GCTR_TestCase14() {
+GCTR_test_all_zero_input() {
     uint8_t key[32] = {0};
     uint8_t plaintext[16] = {0};
     U128 ICB = {.hi = 0, .lo = 0x0200000000000000}; // for little-endian, big endian would be 0x0000000000000002
@@ -141,7 +138,7 @@ GCTR_TestCase14() {
 }
 
 bool
-GCTR_TestCase15() {
+GCTR_test_multiblock_no_remainder() {
     uint8_t key[32] = {0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c, 0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
                        0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c, 0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08};
 
@@ -163,7 +160,7 @@ GCTR_TestCase15() {
 }
 
 bool
-GCTR_TestCase16() {
+GCTR_test_multiblock_non_multiple_of_128() {
     uint8_t key[32] = {0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c, 0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
                        0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c, 0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08};
 
@@ -184,31 +181,20 @@ GCTR_TestCase16() {
     return ft_memcmp(X.msg.data, expected_ciphertext, 60) == 0;
 }
 
-// https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf (:27: AES Test Vectors)
-int
-main() {
-    // GHASH
+bool
+GHASH_test_empty_input_returns_zero() {
     U128 t1 = {0x66e94bd4ef8a2c3b, 0x884cfa59ca342b2e};
     U128 r1 = GHASH(&t1, NULL, 0);
-    assert(r1.hi == 0);
-    assert(r1.lo == 0);
+    return r1.hi == 0 && r1.lo == 0;
+}
 
+bool
+GHASH_test_two_blocks() {
     U128 t2 = {0x66e94bd4ef8a2c3b, 0x884cfa59ca342b2e};
     U128 blocks[2] = {
         (U128){.hi = 0x0388dace60b6a392, .lo = 0xf328c2b971b2fe78},
         (U128){.hi = 0x0000000000000000, .lo = 0x0000000000000080}
     };
     U128 r2 = GHASH(&t2, blocks, 2);
-    assert(r2.hi == 0xf38cbb1ad69223dc);
-    assert(r2.lo == 0xc3457ae5b6b0f885);
-
-    // GCTR
-    assert(GCTR_TestCase13());
-    assert(GCTR_TestCase14());
-    assert(GCTR_TestCase15());
-    assert(GCTR_TestCase16());
-
-    return 0;
+    return r2.hi == 0xf38cbb1ad69223dc && r2.lo == 0xc3457ae5b6b0f885;
 }
-
-#endif

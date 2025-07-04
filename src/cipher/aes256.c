@@ -2,6 +2,7 @@
 #include "mem.h"
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #define Nr 14
@@ -312,54 +313,3 @@ Aes256_ECB_Decrypt(Aes256Data *data) {
 
     return data;
 }
-
-#ifndef TEST
-#define TEST 1
-#endif
-#if TEST == 1
-#include <assert.h>
-#include <stdio.h>
-
-void
-print_hex(const char *label, const uint8_t *data, int len) {
-    printf("%s: ", label);
-    for (int i = 0; i < len; i++) {
-        printf("%02x", data[i]);
-    }
-    printf("\n");
-}
-
-int
-main() {
-    assert(xTimes(0x57) == 0xae);
-    assert(xTimes(0xae) == 0x47);
-    assert(SBox(0x53) == 0xed);
-    assert(SubWord(0x53535353) == 0xedededed);
-
-    // NIST FIPS 197 Appendix A.3
-    const uint8_t test_key[32] = {0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe, 0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
-                                  0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, 0xd7, 0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf, 0xf4};
-
-    uint32_t w[AES256_EXPANDED_KEY_SIZE_U32] = {0};
-    KeyExpansion(test_key, w);
-
-    assert(w[0] == 0x603deb10);
-    assert(w[1] == 0x15ca71be);
-    assert(w[8] == 0x9ba35411);
-    assert(w[59] == 0x706c631e);
-
-    const uint8_t plaintext[22] = "Hello, World!!\nArthur";
-
-    Aes256Data data = {.msg.data = (uint8_t *)plaintext, .msg.len = sizeof(plaintext)};
-
-    Aes256_ECB_Encrypt(&data);
-
-    Aes256_ECB_Decrypt(&data);
-
-    write(STDOUT_FILENO, data.msg.data, 22);
-
-    for (int i = 0; i < 22; i++) {
-        assert(data.msg.data[i] == plaintext[i]);
-    }
-}
-#endif
