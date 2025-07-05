@@ -50,9 +50,6 @@ struct Words {
 // For each bit `i`:
 // - If the `i`-th bit of `e` is `1` (`e >> i & 1 == 1`), the corresponding bit in `ret` is taken from `f`.
 // - Otherwise, the corresponding bit in `ret` is taken from `g`.
-//
-// Mathematically, this operation can be expressed as:
-//     `Ch(e, f, g) = (e AND f) XOR ((NOT e) AND g)`
 #define Ch(e, f, g) ((e & f) ^ (~e & g))
 
 // `Maj` (majority) chooses each bit of the result `ret` based on the majority value
@@ -61,12 +58,9 @@ struct Words {
 // For each bit `i`:
 // - If at least two of the three corresponding bits in `a`, `b`, and `c` are `1`, the `i`-th bit of `ret` will be `1`.
 // - Otherwise, the `i`-th bit of `ret` will be `0`.
-//
-// Mathematically, this operation can be expressed as:
-//     `Maj(a, b, c) = (a AND b) XOR (a AND c) XOR (b AND c)`
 #define Maj(a, b, c) ((a & b) ^ (a & c) ^ (b & c))
 
-// When padding the message, we append a single `1` bit to the message, followed by `k` `0` bits 
+// When padding the message, we append a single `1` bit to the message, followed by `k` `0` bits
 // where `k` is the minimum number `>= 0` such that `(L + 1 + k + 64) % 512 == 0` holds true.
 // Finally, we append the original length of the message in bits as a big-endian 64-bit integer.
 static Message

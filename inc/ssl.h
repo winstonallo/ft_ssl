@@ -31,7 +31,7 @@ typedef struct File {
 } File;
 
 typedef struct Algo {
-    int (*hash_func)(File *, char *);
+    int (*f)(File *, char *);
     char *cmd;
     char *display_name;
     uint8_t output_buffer_size;
@@ -61,7 +61,7 @@ int sha256(File *msg, char *buf);
 int help();
 
 // options.c
-Algo *options_parse(struct Options *const args, char **av);
+Algo *options_parse(const Algo *const algo_map, struct Options *const args, char **av);
 void options_cleanup(File *head);
 
 // alloc.c

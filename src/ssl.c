@@ -21,7 +21,7 @@ main(int ac, char **av) {
 
     struct Options opts = {0};
 
-    Algo *algo = options_parse(&opts, av);
+    Algo *algo = options_parse(algo_map, &opts, av);
     if (!algo) {
         options_cleanup(opts.targets);
         return EXIT_FAILURE;
@@ -39,7 +39,7 @@ main(int ac, char **av) {
 
         char buf[algo->output_buffer_size];
 
-        if (algo->hash_func(it, buf) == -1) {
+        if (algo->f(it, buf) == -1) {
             continue;
         }
 
