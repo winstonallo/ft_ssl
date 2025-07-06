@@ -1,10 +1,14 @@
 #include "aes.h"
+#include "alloc.h"
+#include "bit.h"
 #include "mem.h"
 #include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #define IV_LEN_BYTES 12
 #define BLOCK_LEN_BYTES 16
@@ -14,51 +18,63 @@ typedef struct {
     uint64_t lo;
 } U128;
 
-static const U128 R = {
-    .hi = 0xE100000000000000ULL,
-    .lo = 0x0000000000000000ULL,
-};
+__attribute__((always_inline)) static inline void
+GcmMul(const uint8_t X[16], const uint8_t Y[16], uint8_t out[16]) {
+    uint8_t Z[16] = {0};
+    uint8_t V[16];
 
-__attribute__((always_inline)) static inline U128
-GcmMul(const U128 *const X, const U128 *const Y) {
-    U128 Z = {0};
-    U128 V = *Y;
+    ft_memcpy(V, Y, 16);
 
+    // Process bits x0, x1, ..., x127 of X where x0 is leftmost bit
     for (int i = 0; i < 128; ++i) {
-        int Xi = i < 64 ? (X->hi >> (63 - i)) & 1 : (X->lo >> (127 - i)) & 1;
+        // Get bit i from X (bit 0 is leftmost bit of byte 0)
+        int bit = (X[i / 8] >> (7 - (i % 8))) & 1;
 
-        if (Xi == 1) {
-            Z.hi ^= V.hi;
-            Z.lo ^= V.lo;
+        if (bit == 1) {
+            for (int j = 0; j < 16; ++j) {
+                Z[j] ^= V[j];
+            }
         }
 
-        int lsb = V.lo & 1;
+        // Check LSB of V (rightmost bit)
+        int lsb = V[15] & 1;
 
-        uint64_t carry = V.hi & 1;
-        V.hi >>= 1;
-        V.lo = (V.lo >> 1) | (carry << 63);
+        // Right shift V by 1 bit
+        for (int j = 15; j > 0; --j) {
+            V[j] = (V[j] >> 1) | ((V[j - 1] & 1) << 7);
+        }
+        V[0] >>= 1;
 
+        // If LSB was 1, XOR with R = 11100001 || 0^120
         if (lsb == 1) {
-            V.hi ^= R.hi;
-            V.lo ^= R.lo;
+            V[0] ^= 0xe1;
         }
     }
 
-    return Z;
+    ft_memcpy(out, Z, 16);
 }
 
-__attribute__((always_inline)) static inline U128
-GHASH(const U128 *const H, const U128 *const blocks, size_t n_blocks) {
-    U128 Y = {0};
+__attribute__((always_inline)) static inline void
+GHASH(const uint8_t H[16], const uint8_t *const data, size_t len, uint8_t out[16]) {
+    uint8_t Y[16] = {0};
 
-    for (size_t i = 0; i < n_blocks; ++i) {
-        Y.hi ^= blocks[i].hi;
-        Y.lo ^= blocks[i].lo;
+    for (size_t i = 0; i < len; i += 16) {
+        uint8_t block[16] = {0};
+        size_t block_len = (len - i) > 16 ? 16 : (len - i);
 
-        Y = GcmMul(&Y, H);
+        // Copy the block (handles partial blocks correctly)
+        ft_memcpy(block, data + i, block_len);
+
+        // XOR with previous result
+        for (int j = 0; j < 16; ++j) {
+            Y[j] ^= block[j];
+        }
+
+        // Multiply by H
+        GcmMul(Y, H, Y);
     }
 
-    return Y;
+    ft_memcpy(out, Y, 16);
 }
 
 __attribute__((always_inline)) static inline uint32_t
@@ -109,15 +125,63 @@ GCTR(const U128 *const restrict ICB, const Aes256Data *const X, Aes256Data *cons
     Y->msg.len = X->msg.len;
 }
 
+void
+Aes256_GCM(Aes256Gcm *const P, Aes256Gcm *const out) {
+    (void)out;
+
+    uint8_t H[16] = {0};
+    Cipher(H, H, P->expanded_key);
+
+    U128 J0 = {0};
+    J0.hi = BSWAP_64(*(uint64_t *)P->iv);
+    J0.lo = ((uint64_t)BSWAP_32(*(uint32_t *)&P->iv[8]) << 32) | 0x1;
+
+    U128 J1 = {J0.hi, J0.lo + 1};
+
+    GCTR(&J1, (Aes256Data *)P, (Aes256Data *)P);
+
+    const uint64_t u = (128 * ((P->msg.len * 8) / 128) - P->msg.len * 8);
+    const uint64_t v = (128 * ((P->aad.len * 8) / 128) - P->aad.len * 8);
+
+    uint8_t *const S = ft_calloc(P->aad.len + v + P->msg.len + u + 128, 1);
+    if (S == NULL) {
+        fprintf(stderr, "Error allocating S: %s\n", strerror(errno));
+        return;
+    }
+
+    const uint64_t aad_bitlen = BSWAP_64(P->aad.len / 8);
+    const uint64_t msg_bitlen = BSWAP_64(P->msg.len / 8);
+
+    ft_memcpy(S, P->aad.data, P->aad.len);
+    ft_memcpy(S + P->aad.len + v, P->msg.data, P->msg.len);
+    ft_memcpy(S + P->aad.len + v + P->msg.len + u, &aad_bitlen, 8);
+    ft_memcpy(S + P->aad.len + v + P->msg.len + u + 8, &msg_bitlen, 8);
+
+    printf("0x%016lx%016lx\n", J1.hi, J1.lo);
+}
+
+bool
+GCMAE_basic() {
+    uint8_t key[32] = {0};
+    uint8_t plaintext[1] = {0};
+
+    Aes256Gcm X = {0};
+    AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
+    uint8_t iv[12] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb};
+    ft_memcpy(X.iv, iv, 12);
+    Aes256_GCM(&X, &X);
+    return true;
+}
+
 bool
 GCTR_test_empty_input_returns_empty_cipher() {
     uint8_t key[32] = {0};
     uint8_t plaintext[1] = {0};
     U128 ICB = {.hi = 0x0000000000000000ULL, .lo = 0x0100000000000000ULL};
 
-    Aes256Data X = {0};
-    AES256_Init(&X, key, plaintext, 0); // 0 length
-    GCTR(&ICB, &X, &X);
+    Aes256Gcm X = {0};
+    AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
+    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return X.msg.len == 0;
 }
@@ -130,9 +194,9 @@ GCTR_test_all_zero_input() {
 
     uint8_t expected[16] = {0xce, 0xa7, 0x40, 0x3d, 0x4d, 0x60, 0x6b, 0x6e, 0x07, 0x4e, 0xc5, 0xd3, 0xba, 0xf3, 0x9d, 0x18};
 
-    Aes256Data X = {0};
-    AES256_Init(&X, key, plaintext, sizeof(plaintext));
-    GCTR(&ICB, &X, &X);
+    Aes256Gcm X = {0};
+    AES256_Init((Aes256Data *)&X, key, plaintext, sizeof(plaintext));
+    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return ft_memcmp(X.msg.data, expected, 16) == 0;
 }
@@ -152,9 +216,9 @@ GCTR_test_multiblock_no_remainder() {
                             0xc0, 0xc9, 0x75, 0x98, 0xa2, 0xbd, 0x25, 0x55, 0xd1, 0xaa, 0x8c, 0xb0, 0x8e, 0x48, 0x59, 0x0d, 0xbb, 0x3d, 0xa7, 0xb0, 0x8b, 0x10,
                             0x56, 0x82, 0x88, 0x38, 0xc5, 0xf6, 0x1e, 0x63, 0x93, 0xba, 0x7a, 0x0a, 0xbc, 0xc9, 0xf6, 0x62, 0x89, 0x80, 0x15, 0xad};
 
-    Aes256Data X = {0};
-    AES256_Init(&X, key, plaintext, sizeof(plaintext));
-    GCTR(&ICB, &X, &X);
+    Aes256Gcm X = {0};
+    AES256_Init((Aes256Data *)&X, key, plaintext, sizeof(plaintext));
+    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return ft_memcmp(X.msg.data, expected, 64) == 0;
 }
@@ -174,27 +238,41 @@ GCTR_test_multiblock_non_multiple_of_128() {
                                        0xbf, 0xe5, 0xc0, 0xc9, 0x75, 0x98, 0xa2, 0xbd, 0x25, 0x55, 0xd1, 0xaa, 0x8c, 0xb0, 0x8e, 0x48, 0x59, 0x0d, 0xbb, 0x3d,
                                        0xa7, 0xb0, 0x8b, 0x10, 0x56, 0x82, 0x88, 0x38, 0xc5, 0xf6, 0x1e, 0x63, 0x93, 0xba, 0x7a, 0x0a, 0xbc, 0xc9, 0xf6, 0x62};
 
-    Aes256Data X = {0};
-    AES256_Init(&X, key, plaintext, sizeof(plaintext));
-    GCTR(&ICB, &X, &X);
+    Aes256Gcm X = {0};
+    AES256_Init((Aes256Data *)&X, key, plaintext, sizeof(plaintext));
+    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return ft_memcmp(X.msg.data, expected_ciphertext, 60) == 0;
 }
 
 bool
 GHASH_test_empty_input_returns_zero() {
-    U128 t1 = {0x66e94bd4ef8a2c3b, 0x884cfa59ca342b2e};
-    U128 r1 = GHASH(&t1, NULL, 0);
-    return r1.hi == 0 && r1.lo == 0;
+    uint8_t t[16] = {0x66, 0xe9, 0x4b, 0xd4, 0xef, 0x81, 0x2c, 0x3b, 0x88, 0x4c, 0xfa, 0x59, 0xca, 0x34, 0x2b, 0x2e};
+    uint8_t out[16] = {0};
+    GHASH(t, NULL, 0, out);
+
+    for (int i = 0; i < 16; ++i) {
+        if (out[i] != 0) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool
 GHASH_test_two_blocks() {
-    U128 t2 = {0x66e94bd4ef8a2c3b, 0x884cfa59ca342b2e};
-    U128 blocks[2] = {
-        (U128){.hi = 0x0388dace60b6a392, .lo = 0xf328c2b971b2fe78},
-        (U128){.hi = 0x0000000000000000, .lo = 0x0000000000000080}
-    };
-    U128 r2 = GHASH(&t2, blocks, 2);
-    return r2.hi == 0xf38cbb1ad69223dc && r2.lo == 0xc3457ae5b6b0f885;
+    uint8_t t[16] = {0x66, 0xe9, 0x4b, 0xd4, 0xef, 0x81, 0x2c, 0x3b, 0x88, 0x4c, 0xfa, 0x59, 0xca, 0x34, 0x2b, 0x2e};
+    uint8_t data[32] = {0x03, 0x88, 0xda, 0xce, 0x60, 0xb6, 0xa3, 0x92, 0xf3, 0x28, 0xc2, 0xb9, 0x71, 0xb2, 0xfe, 0x78,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80};
+    uint8_t out[16] = {0};
+    GHASH(t, data, sizeof(data), out);
+
+    const uint8_t expected[16] = {0xf3, 0x8c, 0xbb, 0x1a, 0xd6, 0x92, 0x23, 0xdc, 0xc3, 0x45, 0x7a, 0xe5, 0xb6, 0xb0, 0xf8, 0x85};
+
+    for (int i = 0; i < 16; ++i) {
+        if (out[i] != expected[i]) {
+            return false;
+        }
+    }
+    return true;
 }
