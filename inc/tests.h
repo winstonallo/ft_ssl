@@ -14,4 +14,6 @@ bool GCTR_test_multiblock_non_multiple_of_128();
 bool GHASH_test_empty_input_returns_zero();
 bool GHASH_test_two_blocks();
 
+bool GCMAE_basic();
+
 #endif
