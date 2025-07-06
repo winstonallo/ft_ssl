@@ -9,13 +9,30 @@
 #define AES256_EXPANDED_KEY_SIZE_U32 (4 * (14 + 1))
 
 typedef struct {
+    uint8_t key[AES256_KEY_SIZE_BYTES];
+    uint32_t expanded_key[AES256_EXPANDED_KEY_SIZE_U32];
     struct {
         uint8_t *data;
         size_t len;
     } msg;
+} Aes256Data;
+
+typedef struct {
     uint8_t key[AES256_KEY_SIZE_BYTES];
     uint32_t expanded_key[AES256_EXPANDED_KEY_SIZE_U32];
-} Aes256Data;
+    // Data to en/decrypt (P/C)
+    struct {
+        uint8_t *data;
+        size_t len;
+    } msg;
+    // Additional Authenticated Data
+    struct {
+        uint8_t *data;
+        size_t len;
+    } aad;
+    uint8_t tag[16];
+    uint8_t iv[12];
+} Aes256Gcm;
 
 Aes256Data *Aes256_ECB_Encrypt(Aes256Data *);
 Aes256Data *Aes256_ECB_Decrypt(Aes256Data *);
