@@ -77,15 +77,15 @@ GHASH(const uint8_t H[16], const uint8_t *const data, size_t len, uint8_t out[16
     ft_memcpy(out, Y, 16);
 }
 
-__attribute__((always_inline)) static inline uint32_t
-inc32_be(uint32_t num) {
-    return __builtin_bswap32(__builtin_bswap32(num) + 1);
-}
+// __attribute__((always_inline)) static inline uint32_t
+// inc32_be(uint32_t num) {
+//     return __builtin_bswap32(__builtin_bswap32(num) + 1);
+// }
 
 // `Y->msg.data` is expected to have at least `X->msg.len` bytes allocated.
 // `X->msg.data` and `Y->msg.data` may overlap.
 __attribute__((always_inline)) static inline void
-GCTR(const U128 *const restrict ICB, const Aes256Data *const X, Aes256Data *const Y) {
+GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *const Y) {
     if (X->msg.len == 0) {
         *Y = (Aes256Data){0};
         ft_memcpy(Y->key, X->key, sizeof(X->key));
@@ -94,7 +94,9 @@ GCTR(const U128 *const restrict ICB, const Aes256Data *const X, Aes256Data *cons
 
     const size_t n_complete_blocks = X->msg.len / BLOCK_LEN_BYTES;
     const size_t partial_block_len = X->msg.len % BLOCK_LEN_BYTES;
-    U128 CB = *ICB;
+    uint8_t CB[16];
+    ft_memcpy(CB, ICB, 16);
+    // U128 CB = *ICB;
 
     for (size_t i = 0; i < n_complete_blocks; ++i) {
         uint8_t Ei[AES256_BLOCK_SIZE_BYTES];
@@ -106,7 +108,7 @@ GCTR(const U128 *const restrict ICB, const Aes256Data *const X, Aes256Data *cons
 
         if (i < n_complete_blocks - 1 || partial_block_len > 0) {
             uint32_t *counter_part = (uint32_t *)((uint8_t *)&CB + 12);
-            *counter_part = inc32_be(*counter_part);
+            *counter_part = BSWAP_32(BSWAP_32(*counter_part) + 1);
         }
     }
 
@@ -125,63 +127,63 @@ GCTR(const U128 *const restrict ICB, const Aes256Data *const X, Aes256Data *cons
     Y->msg.len = X->msg.len;
 }
 
-void
-Aes256_GCM(Aes256Gcm *const P, Aes256Gcm *const out) {
-    (void)out;
+// void
+// Aes256_GCM(Aes256Gcm *const P, Aes256Gcm *const out) {
+//     (void)out;
 
-    uint8_t H[16] = {0};
-    Cipher(H, H, P->expanded_key);
+//     uint8_t H[16] = {0};
+//     Cipher(H, H, P->expanded_key);
 
-    U128 J0 = {0};
-    J0.hi = BSWAP_64(*(uint64_t *)P->iv);
-    J0.lo = ((uint64_t)BSWAP_32(*(uint32_t *)&P->iv[8]) << 32) | 0x1;
+//     U128 J0 = {0};
+//     J0.hi = BSWAP_64(*(uint64_t *)P->iv);
+//     J0.lo = ((uint64_t)BSWAP_32(*(uint32_t *)&P->iv[8]) << 32) | 0x1;
 
-    U128 J1 = {J0.hi, J0.lo + 1};
+//     U128 J1 = {J0.hi, J0.lo + 1};
 
-    GCTR(&J1, (Aes256Data *)P, (Aes256Data *)P);
+//     GCTR(&J1, (Aes256Data *)P, (Aes256Data *)P);
 
-    const uint64_t u = (128 * ((P->msg.len * 8) / 128) - P->msg.len * 8);
-    const uint64_t v = (128 * ((P->aad.len * 8) / 128) - P->aad.len * 8);
+//     const uint64_t u = (128 * ((P->msg.len * 8) / 128) - P->msg.len * 8);
+//     const uint64_t v = (128 * ((P->aad.len * 8) / 128) - P->aad.len * 8);
 
-    uint8_t *const S = ft_calloc(P->aad.len + v + P->msg.len + u + 128, 1);
-    if (S == NULL) {
-        fprintf(stderr, "Error allocating S: %s\n", strerror(errno));
-        return;
-    }
+//     uint8_t *const S = ft_calloc(P->aad.len + v + P->msg.len + u + 128, 1);
+//     if (S == NULL) {
+//         fprintf(stderr, "Error allocating S: %s\n", strerror(errno));
+//         return;
+//     }
 
-    const uint64_t aad_bitlen = BSWAP_64(P->aad.len / 8);
-    const uint64_t msg_bitlen = BSWAP_64(P->msg.len / 8);
+//     const uint64_t aad_bitlen = BSWAP_64(P->aad.len / 8);
+//     const uint64_t msg_bitlen = BSWAP_64(P->msg.len / 8);
 
-    ft_memcpy(S, P->aad.data, P->aad.len);
-    ft_memcpy(S + P->aad.len + v, P->msg.data, P->msg.len);
-    ft_memcpy(S + P->aad.len + v + P->msg.len + u, &aad_bitlen, 8);
-    ft_memcpy(S + P->aad.len + v + P->msg.len + u + 8, &msg_bitlen, 8);
+//     ft_memcpy(S, P->aad.data, P->aad.len);
+//     ft_memcpy(S + P->aad.len + v, P->msg.data, P->msg.len);
+//     ft_memcpy(S + P->aad.len + v + P->msg.len + u, &aad_bitlen, 8);
+//     ft_memcpy(S + P->aad.len + v + P->msg.len + u + 8, &msg_bitlen, 8);
 
-    printf("0x%016lx%016lx\n", J1.hi, J1.lo);
-}
+//     printf("0x%016lx%016lx\n", J1.hi, J1.lo);
+// }
 
-bool
-GCMAE_basic() {
-    uint8_t key[32] = {0};
-    uint8_t plaintext[1] = {0};
+// bool
+// GCMAE_basic() {
+//     uint8_t key[32] = {0};
+//     uint8_t plaintext[1] = {0};
 
-    Aes256Gcm X = {0};
-    AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
-    uint8_t iv[12] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb};
-    ft_memcpy(X.iv, iv, 12);
-    Aes256_GCM(&X, &X);
-    return true;
-}
+//     Aes256Gcm X = {0};
+//     AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
+//     uint8_t iv[12] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb};
+//     ft_memcpy(X.iv, iv, 12);
+//     Aes256_GCM(&X, &X);
+//     return true;
+// }
 
 bool
 GCTR_test_empty_input_returns_empty_cipher() {
     uint8_t key[32] = {0};
     uint8_t plaintext[1] = {0};
-    U128 ICB = {.hi = 0x0000000000000000ULL, .lo = 0x0100000000000000ULL};
+    uint8_t ICB[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 
     Aes256Gcm X = {0};
     AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
-    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
+    GCTR(ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return X.msg.len == 0;
 }
@@ -190,13 +192,13 @@ bool
 GCTR_test_all_zero_input() {
     uint8_t key[32] = {0};
     uint8_t plaintext[16] = {0};
-    U128 ICB = {.hi = 0, .lo = 0x0200000000000000}; // for little-endian, big endian would be 0x0000000000000002
+    uint8_t ICB[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2};
 
     uint8_t expected[16] = {0xce, 0xa7, 0x40, 0x3d, 0x4d, 0x60, 0x6b, 0x6e, 0x07, 0x4e, 0xc5, 0xd3, 0xba, 0xf3, 0x9d, 0x18};
 
     Aes256Gcm X = {0};
     AES256_Init((Aes256Data *)&X, key, plaintext, sizeof(plaintext));
-    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
+    GCTR(ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return ft_memcmp(X.msg.data, expected, 16) == 0;
 }
@@ -210,7 +212,7 @@ GCTR_test_multiblock_no_remainder() {
                              0xf7, 0xda, 0x2e, 0x4c, 0x30, 0x3d, 0x8a, 0x31, 0x8a, 0x72, 0x1c, 0x3c, 0x0c, 0x95, 0x95, 0x68, 0x09, 0x53, 0x2f, 0xcf, 0x0e, 0x24,
                              0x49, 0xa6, 0xb5, 0x25, 0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57, 0xba, 0x63, 0x7b, 0x39, 0x1a, 0xaf, 0xd2, 0x55};
 
-    U128 ICB = {.hi = 0xaddbcefabebafecaULL, .lo = 0x0200000088f8cadeULL};
+    uint8_t ICB[16] = {0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88, 0x00, 0x00, 0x00, 0x02};
 
     uint8_t expected[64] = {0x52, 0x2d, 0xc1, 0xf0, 0x99, 0x56, 0x7d, 0x07, 0xf4, 0x7f, 0x37, 0xa3, 0x2a, 0x84, 0x42, 0x7d, 0x64, 0x3a, 0x8c, 0xdc, 0xbf, 0xe5,
                             0xc0, 0xc9, 0x75, 0x98, 0xa2, 0xbd, 0x25, 0x55, 0xd1, 0xaa, 0x8c, 0xb0, 0x8e, 0x48, 0x59, 0x0d, 0xbb, 0x3d, 0xa7, 0xb0, 0x8b, 0x10,
@@ -218,7 +220,7 @@ GCTR_test_multiblock_no_remainder() {
 
     Aes256Gcm X = {0};
     AES256_Init((Aes256Data *)&X, key, plaintext, sizeof(plaintext));
-    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
+    GCTR(ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return ft_memcmp(X.msg.data, expected, 64) == 0;
 }
@@ -232,7 +234,7 @@ GCTR_test_multiblock_non_multiple_of_128() {
                              0x15, 0x34, 0xf7, 0xda, 0x2e, 0x4c, 0x30, 0x3d, 0x8a, 0x31, 0x8a, 0x72, 0x1c, 0x3c, 0x0c, 0x95, 0x95, 0x68, 0x09, 0x53,
                              0x2f, 0xcf, 0x0e, 0x24, 0x49, 0xa6, 0xb5, 0x25, 0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57, 0xba, 0x63, 0x7b, 0x39};
 
-    U128 ICB = {.hi = 0xaddbcefabebafecaULL, .lo = 0x0200000088f8cadeULL};
+    uint8_t ICB[16] = {0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88, 0x00, 0x00, 0x00, 0x02};
 
     uint8_t expected_ciphertext[60] = {0x52, 0x2d, 0xc1, 0xf0, 0x99, 0x56, 0x7d, 0x07, 0xf4, 0x7f, 0x37, 0xa3, 0x2a, 0x84, 0x42, 0x7d, 0x64, 0x3a, 0x8c, 0xdc,
                                        0xbf, 0xe5, 0xc0, 0xc9, 0x75, 0x98, 0xa2, 0xbd, 0x25, 0x55, 0xd1, 0xaa, 0x8c, 0xb0, 0x8e, 0x48, 0x59, 0x0d, 0xbb, 0x3d,
@@ -240,7 +242,7 @@ GCTR_test_multiblock_non_multiple_of_128() {
 
     Aes256Gcm X = {0};
     AES256_Init((Aes256Data *)&X, key, plaintext, sizeof(plaintext));
-    GCTR(&ICB, (Aes256Data *)&X, (Aes256Data *)&X);
+    GCTR(ICB, (Aes256Data *)&X, (Aes256Data *)&X);
 
     return ft_memcmp(X.msg.data, expected_ciphertext, 60) == 0;
 }
