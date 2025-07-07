@@ -136,26 +136,81 @@ Aes256_GCM(Aes256Gcm *const P, Aes256Gcm *const out) {
 
     GCTR(J1, (Aes256Data *)P, (Aes256Data *)P);
 
-    const uint64_t u = (128 * ((P->msg.len * 8) / 128) - P->msg.len * 8);
-    const uint64_t v = (128 * ((P->aad.len * 8) / 128) - P->aad.len * 8);
+    const uint64_t msg_bits = P->msg.len * 8;
+    const uint64_t aad_bits = P->aad.len * 8;
+    const uint64_t u_bits = (128 - (msg_bits % 128)) % 128;
+    const uint64_t v_bits = (128 - (aad_bits % 128)) % 128;
+    const uint64_t u_bytes = u_bits / 8;
+    const uint64_t v_bytes = v_bits / 8;
 
-    uint8_t *const S = ft_calloc(P->aad.len + v + P->msg.len + u + 128, 1);
-    if (S == NULL) {
+    printf("msg.len=%zu, aad.len=%zu\n", P->msg.len, P->aad.len);
+    printf("msg_bits=%lu, aad_bits=%lu\n", msg_bits, aad_bits);
+    printf("u_bits=%lu, v_bits=%lu\n", u_bits, v_bits);
+    printf("u_bytes=%lu, v_bytes=%lu\n", u_bytes, v_bytes);
+
+    const size_t S_buf_len = P->aad.len + v_bytes + P->msg.len + u_bytes + 16;
+    uint8_t *const S_buf = ft_calloc(S_buf_len, 1);
+    if (S_buf == NULL) {
         fprintf(stderr, "Error allocating S: %s\n", strerror(errno));
         return;
     }
 
-    const uint64_t aad_bitlen = BSWAP_64(P->aad.len / 8);
-    const uint64_t msg_bitlen = BSWAP_64(P->msg.len / 8);
+    printf("S_buf_len=%zu\n", S_buf_len);
 
-    ft_memcpy(S, P->aad.data, P->aad.len);
-    ft_memcpy(S + P->aad.len + v, P->msg.data, P->msg.len);
-    ft_memcpy(S + P->aad.len + v + P->msg.len + u, &aad_bitlen, 8);
-    ft_memcpy(S + P->aad.len + v + P->msg.len + u + 8, &msg_bitlen, 8);
+    const uint64_t aad_bitlen = BSWAP_64(P->aad.len * 8);
+    const uint64_t msg_bitlen = BSWAP_64(P->msg.len * 8);
 
+    size_t offset = 0;
+
+    ft_memcpy(S_buf + offset, P->aad.data, P->aad.len);
+    offset += P->aad.len + v_bytes;
+    ft_memcpy(S_buf + offset, P->msg.data, P->msg.len);
+    offset += P->msg.len + u_bytes;
+    ft_memcpy(S_buf + offset, &aad_bitlen, 8);
+    ft_memcpy(S_buf + offset + 8, &msg_bitlen, 8);
+
+    printf("S_buf: ");
+    for (size_t i = 0; i < S_buf_len; ++i) {
+        printf("%02x", S_buf[i]);
+    }
+    printf("\n");
+
+    uint8_t S[16] = {0};
+    GHASH(H, S_buf, S_buf_len, S);
+
+    uint8_t T_data_buf[16];
+    ft_memcpy(T_data_buf, S, 16);
+
+    Aes256Data T_data = {0};
+    T_data.msg.data = T_data_buf;
+    T_data.msg.len = 16;
+    ft_memcpy(T_data.key, P->key, 32);
+    ft_memcpy(T_data.expanded_key, P->expanded_key, 60 * sizeof(uint32_t));
+
+    GCTR(J0, &T_data, &T_data);
+
+    printf("H: ");
+    for (int i = 0; i < 16; ++i) {
+        printf("%02x", H[i]);
+    }
+    printf("\nJ0: ");
+    for (int i = 0; i < 16; ++i) {
+        printf("%02x", J0[i]);
+    }
+    printf("\nJ1: ");
     for (int i = 0; i < 16; ++i) {
         printf("%02x", J1[i]);
     }
+
+    printf("\nS (GHASH result): ");
+    for (int i = 0; i < 16; ++i) {
+        printf("%02x", S[i]);
+    }
+    printf("\nAuthentication Tag: ");
+    for (int i = 0; i < 16; ++i) {
+        printf("%02x", T_data.msg.data[i]);
+    }
+    printf("\n");
 }
 
 bool
@@ -165,7 +220,7 @@ GCMAE_basic() {
 
     Aes256Gcm X = {0};
     AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
-    uint8_t iv[12] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb};
+    uint8_t iv[12] = {0};
     ft_memcpy(X.iv, iv, 12);
     Aes256_GCM(&X, &X);
     return true;
