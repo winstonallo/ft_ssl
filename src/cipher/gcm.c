@@ -13,11 +13,6 @@
 #define IV_LEN_BYTES 12
 #define BLOCK_LEN_BYTES 16
 
-typedef struct {
-    uint64_t hi;
-    uint64_t lo;
-} U128;
-
 __attribute__((always_inline)) static inline void
 GcmMul(const uint8_t X[16], const uint8_t Y[16], uint8_t out[16]) {
     uint8_t Z[16] = {0};
@@ -77,11 +72,6 @@ GHASH(const uint8_t H[16], const uint8_t *const data, size_t len, uint8_t out[16
     ft_memcpy(out, Y, 16);
 }
 
-// __attribute__((always_inline)) static inline uint32_t
-// inc32_be(uint32_t num) {
-//     return __builtin_bswap32(__builtin_bswap32(num) + 1);
-// }
-
 // `Y->msg.data` is expected to have at least `X->msg.len` bytes allocated.
 // `X->msg.data` and `Y->msg.data` may overlap.
 __attribute__((always_inline)) static inline void
@@ -127,53 +117,59 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
     Y->msg.len = X->msg.len;
 }
 
-// void
-// Aes256_GCM(Aes256Gcm *const P, Aes256Gcm *const out) {
-//     (void)out;
+void
+Aes256_GCM(Aes256Gcm *const P, Aes256Gcm *const out) {
+    (void)out;
 
-//     uint8_t H[16] = {0};
-//     Cipher(H, H, P->expanded_key);
+    uint8_t H[16] = {0};
+    Cipher(H, H, P->expanded_key);
 
-//     U128 J0 = {0};
-//     J0.hi = BSWAP_64(*(uint64_t *)P->iv);
-//     J0.lo = ((uint64_t)BSWAP_32(*(uint32_t *)&P->iv[8]) << 32) | 0x1;
+    uint8_t J0[16] = {0};
+    ft_memcpy(J0, P->iv, 12);
+    J0[15] |= 1;
 
-//     U128 J1 = {J0.hi, J0.lo + 1};
+    uint8_t J1[16] = {0};
+    ft_memcpy(J1, J0, 16);
 
-//     GCTR(&J1, (Aes256Data *)P, (Aes256Data *)P);
+    uint32_t *counter_part = (uint32_t *)((uint8_t *)&J1[12]);
+    *counter_part = BSWAP_32(BSWAP_32(*counter_part) + 1);
 
-//     const uint64_t u = (128 * ((P->msg.len * 8) / 128) - P->msg.len * 8);
-//     const uint64_t v = (128 * ((P->aad.len * 8) / 128) - P->aad.len * 8);
+    GCTR(J1, (Aes256Data *)P, (Aes256Data *)P);
 
-//     uint8_t *const S = ft_calloc(P->aad.len + v + P->msg.len + u + 128, 1);
-//     if (S == NULL) {
-//         fprintf(stderr, "Error allocating S: %s\n", strerror(errno));
-//         return;
-//     }
+    const uint64_t u = (128 * ((P->msg.len * 8) / 128) - P->msg.len * 8);
+    const uint64_t v = (128 * ((P->aad.len * 8) / 128) - P->aad.len * 8);
 
-//     const uint64_t aad_bitlen = BSWAP_64(P->aad.len / 8);
-//     const uint64_t msg_bitlen = BSWAP_64(P->msg.len / 8);
+    uint8_t *const S = ft_calloc(P->aad.len + v + P->msg.len + u + 128, 1);
+    if (S == NULL) {
+        fprintf(stderr, "Error allocating S: %s\n", strerror(errno));
+        return;
+    }
 
-//     ft_memcpy(S, P->aad.data, P->aad.len);
-//     ft_memcpy(S + P->aad.len + v, P->msg.data, P->msg.len);
-//     ft_memcpy(S + P->aad.len + v + P->msg.len + u, &aad_bitlen, 8);
-//     ft_memcpy(S + P->aad.len + v + P->msg.len + u + 8, &msg_bitlen, 8);
+    const uint64_t aad_bitlen = BSWAP_64(P->aad.len / 8);
+    const uint64_t msg_bitlen = BSWAP_64(P->msg.len / 8);
 
-//     printf("0x%016lx%016lx\n", J1.hi, J1.lo);
-// }
+    ft_memcpy(S, P->aad.data, P->aad.len);
+    ft_memcpy(S + P->aad.len + v, P->msg.data, P->msg.len);
+    ft_memcpy(S + P->aad.len + v + P->msg.len + u, &aad_bitlen, 8);
+    ft_memcpy(S + P->aad.len + v + P->msg.len + u + 8, &msg_bitlen, 8);
 
-// bool
-// GCMAE_basic() {
-//     uint8_t key[32] = {0};
-//     uint8_t plaintext[1] = {0};
+    for (int i = 0; i < 16; ++i) {
+        printf("%02x", J1[i]);
+    }
+}
 
-//     Aes256Gcm X = {0};
-//     AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
-//     uint8_t iv[12] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb};
-//     ft_memcpy(X.iv, iv, 12);
-//     Aes256_GCM(&X, &X);
-//     return true;
-// }
+bool
+GCMAE_basic() {
+    uint8_t key[32] = {0};
+    uint8_t plaintext[1] = {0};
+
+    Aes256Gcm X = {0};
+    AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
+    uint8_t iv[12] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb};
+    ft_memcpy(X.iv, iv, 12);
+    Aes256_GCM(&X, &X);
+    return true;
+}
 
 bool
 GCTR_test_empty_input_returns_empty_cipher() {
