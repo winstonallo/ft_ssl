@@ -122,7 +122,7 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
 }
 
 void
-Aes256_GCM(Aes256Gcm *const P, Aes256Gcm *const out) {
+GCM_AE(Aes256Gcm *const P, Aes256Gcm *const out) {
     (void)out;
 
     uint8_t H[16] = {0};
