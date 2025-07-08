@@ -2,6 +2,7 @@
 #include "bit.h"
 #include "mem.h"
 #include <assert.h>
+#include <linux/limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -43,7 +44,7 @@ GcmMul(const uint8_t X[16], const uint8_t Y[16], uint8_t out[16]) {
     ft_memcpy(out, Z, 16);
 }
 
-__attribute__((always_inline)) static inline void
+__attribute__((always_inline, unused)) static inline void
 GHASH(const uint8_t H[16], const uint8_t *const data, size_t len, uint8_t out[16]) {
     uint8_t Y[16] = {0};
 
@@ -83,8 +84,6 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
         return;
     }
 
-    const size_t n_complete_blocks = X->msg.len / BLOCK_LEN_BYTES;
-    const size_t partial_block_len = X->msg.len % BLOCK_LEN_BYTES;
     uint8_t CB[16];
     ft_memcpy(CB, ICB, 16);
 
@@ -178,7 +177,7 @@ GCM_AE(Aes256Gcm *const P, Aes256Gcm *const C) {
     ft_memcpy(C->key, P->key, AES256_KEY_SIZE_BYTES);
     C->aad.len = P->aad.len;
     C->msg.len = P->msg.len;
-        }
+}
 
 int
 GCM_AD(Aes256Gcm *const C, Aes256Gcm *const P) {
@@ -210,7 +209,7 @@ GCM_AD(Aes256Gcm *const C, Aes256Gcm *const P) {
     const size_t msg_blocks = C->msg.len / AES256_BLOCK_SIZE_BYTES;
     for (size_t i = 0; i < msg_blocks; ++i) {
         GHASH_block(Y, &C->msg.data[i * AES256_BLOCK_SIZE_BYTES], H);
-        }
+    }
     const size_t msg_remainder = C->msg.len % AES256_BLOCK_SIZE_BYTES;
     if (msg_remainder > 0) {
         uint8_t padded_block[AES256_BLOCK_SIZE_BYTES] = {0};
@@ -227,13 +226,13 @@ GCM_AD(Aes256Gcm *const C, Aes256Gcm *const P) {
     uint8_t temp_tag[TAG_LEN_BYTES] = {0};
     for (int i = 0; i < AES256_BLOCK_SIZE_BYTES; ++i) {
         temp_tag[i] = Y[i] ^ T[i];
-        }
+    }
 
     for (int i = 0; i < TAG_LEN_BYTES; ++i) {
         if (temp_tag[i] != C->tag[i]) {
             // verification failed
             return -1;
-}
+        }
     }
 
     // only decrypt if tag verification succeeds
