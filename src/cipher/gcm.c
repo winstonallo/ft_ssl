@@ -93,7 +93,8 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
 
     for (size_t i = 0; i < n_complete_blocks; ++i) {
         uint8_t Ei[AES256_BLOCK_SIZE_BYTES];
-        Cipher((uint8_t *)&CB, Ei, (uint32_t *)X->expanded_key);
+
+        Cipher(CB, Ei, (uint32_t *)X->expanded_key);
 
         for (int j = 0; j < AES256_BLOCK_SIZE_BYTES; ++j) {
             Y->msg.data[(AES256_BLOCK_SIZE_BYTES * i) + j] = X->msg.data[(AES256_BLOCK_SIZE_BYTES * i) + j] ^ Ei[j];
@@ -108,7 +109,7 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
     if (partial_block_len > 0) {
 
         uint8_t Ei[AES256_BLOCK_SIZE_BYTES];
-        Cipher((uint8_t *)&CB, Ei, (uint32_t *)X->expanded_key);
+        Cipher(CB, Ei, (uint32_t *)X->expanded_key);
 
         for (size_t j = 0; j < partial_block_len; ++j) {
             Y->msg.data[(AES256_BLOCK_SIZE_BYTES * n_complete_blocks) + j] = X->msg.data[(AES256_BLOCK_SIZE_BYTES * n_complete_blocks) + j] ^ Ei[j];
