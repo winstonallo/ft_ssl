@@ -1,9 +1,7 @@
 #include "aes.h"
-#include "alloc.h"
 #include "bit.h"
 #include "mem.h"
 #include <assert.h>
-#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
