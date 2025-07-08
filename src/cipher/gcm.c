@@ -20,9 +20,7 @@ GcmMul(const uint8_t X[16], const uint8_t Y[16], uint8_t out[16]) {
 
     ft_memcpy(V, Y, 16);
 
-    // Process bits x0, x1, ..., x127 of X where x0 is leftmost bit
     for (int i = 0; i < 128; ++i) {
-        // Get bit i from X (bit 0 is leftmost bit of byte 0)
         int bit = (X[i / 8] >> (7 - (i % 8))) & 1;
 
         if (bit == 1) {
@@ -31,16 +29,13 @@ GcmMul(const uint8_t X[16], const uint8_t Y[16], uint8_t out[16]) {
             }
         }
 
-        // Check LSB of V (rightmost bit)
         int lsb = V[15] & 1;
 
-        // Right shift V by 1 bit
         for (int j = 15; j > 0; --j) {
             V[j] = (V[j] >> 1) | ((V[j - 1] & 1) << 7);
         }
         V[0] >>= 1;
 
-        // If LSB was 1, XOR with R = 11100001 || 0^120
         if (lsb == 1) {
             V[0] ^= 0xe1;
         }
@@ -57,15 +52,12 @@ GHASH(const uint8_t H[16], const uint8_t *const data, size_t len, uint8_t out[16
         uint8_t block[16] = {0};
         size_t block_len = (len - i) > 16 ? 16 : (len - i);
 
-        // Copy the block (handles partial blocks correctly)
         ft_memcpy(block, data + i, block_len);
 
-        // XOR with previous result
         for (int j = 0; j < 16; ++j) {
             Y[j] ^= block[j];
         }
 
-        // Multiply by H
         GcmMul(Y, H, Y);
     }
 
@@ -88,7 +80,6 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
     const size_t partial_block_len = X->msg.len % BLOCK_LEN_BYTES;
     uint8_t CB[16];
     ft_memcpy(CB, ICB, 16);
-    // U128 CB = *ICB;
 
     for (size_t i = 0; i < n_complete_blocks; ++i) {
         uint8_t Ei[AES256_BLOCK_SIZE_BYTES];
