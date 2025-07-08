@@ -121,54 +121,54 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
 }
 
 void
-GCM_AE(Aes256Gcm *const P, Aes256Gcm *const out) {
-    uint8_t H[16] = {0};
+GCM_AE(Aes256Gcm *const P, Aes256Gcm *const C) {
+    uint8_t H[AES256_BLOCK_SIZE_BYTES] = {0};
     Cipher(H, H, P->expanded_key);
 
-    uint8_t J0[16] = {0};
-    ft_memcpy(J0, P->iv, 12);
+    uint8_t J0[AES256_BLOCK_SIZE_BYTES] = {0};
+    ft_memcpy(J0, P->iv, IV_LEN_BYTES);
     J0[15] |= 1;
 
-    uint8_t J1[16] = {0};
-    ft_memcpy(J1, J0, 16);
+    uint8_t J1[AES256_BLOCK_SIZE_BYTES] = {0};
+    ft_memcpy(J1, J0, AES256_BLOCK_SIZE_BYTES);
 
-    uint32_t *counter_part = (uint32_t *)((uint8_t *)&J1[12]);
+    uint32_t *counter_part = (uint32_t *)((uint8_t *)&J1[IV_LEN_BYTES]);
     *counter_part = BSWAP_32(BSWAP_32(*counter_part) + 1);
 
-    GCTR(J1, (Aes256Data *)P, (Aes256Data *)P);
+    GCTR(J1, (Aes256Data *)P, (Aes256Data *)C);
 
     uint8_t Y[16] = {0};
 
-    const size_t aad_blocks = P->aad.len / 16;
+    const size_t aad_blocks = P->aad.len / AES256_BLOCK_SIZE_BYTES;
     for (size_t i = 0; i < aad_blocks; ++i) {
-        GHASH_block(Y, &P->aad.data[i * 16], H);
+        GHASH_block(Y, &P->aad.data[i * AES256_BLOCK_SIZE_BYTES], H);
     }
-    const size_t aad_remainder = P->aad.len % 16;
+    const size_t aad_remainder = P->aad.len % AES256_BLOCK_SIZE_BYTES;
     if (aad_remainder > 0) {
-        uint8_t padded_block[16] = {0};
+        uint8_t padded_block[AES256_BLOCK_SIZE_BYTES] = {0};
         ft_memcpy(padded_block, P->aad.data + aad_blocks * 16, aad_remainder);
         GHASH_block(Y, padded_block, H);
     }
 
-    const size_t msg_blocks = P->msg.len / 16;
+    const size_t msg_blocks = P->msg.len / AES256_BLOCK_SIZE_BYTES;
     for (size_t i = 0; i < msg_blocks; ++i) {
-        GHASH_block(Y, &P->msg.data[i * 16], H);
+        GHASH_block(Y, &P->msg.data[i * AES256_BLOCK_SIZE_BYTES], H);
     }
-    const size_t msg_remainder = P->msg.len % 16;
+    const size_t msg_remainder = P->msg.len % AES256_BLOCK_SIZE_BYTES;
     if (msg_remainder > 0) {
-        uint8_t padded_block[16] = {0};
-        ft_memcpy(padded_block, P->msg.data + msg_blocks * 16, msg_remainder);
+        uint8_t padded_block[AES256_BLOCK_SIZE_BYTES] = {0};
+        ft_memcpy(padded_block, P->msg.data + msg_blocks * AES256_BLOCK_SIZE_BYTES, msg_remainder);
         GHASH_block(Y, padded_block, H);
     }
 
     uint64_t len_block[2] = {BSWAP_64(P->aad.len * 8), BSWAP_64(P->msg.len * 8)};
     GHASH_block(Y, (uint8_t *)len_block, H);
 
-    uint8_t T[16];
+    uint8_t T[AES256_BLOCK_SIZE_BYTES];
     Cipher(J0, T, P->expanded_key);
 
-    for (int i = 0; i < 16; ++i) {
-        out->tag[i] = Y[i] ^ T[i];
+    for (int i = 0; i < AES256_BLOCK_SIZE_BYTES; ++i) {
+        C->tag[i] = Y[i] ^ T[i];
     }
 }
 
