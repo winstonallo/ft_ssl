@@ -10,6 +10,7 @@
 
 #define IV_LEN_BYTES 12
 #define BLOCK_LEN_BYTES 16
+#define TAG_LEN_BYTES 16
 
 __attribute__((always_inline)) static inline void
 GcmMul(const uint8_t X[16], const uint8_t Y[16], uint8_t out[16]) {
@@ -87,6 +88,8 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
     uint8_t CB[16];
     ft_memcpy(CB, ICB, 16);
 
+    const size_t n_complete_blocks = X->msg.len / BLOCK_LEN_BYTES;
+    const size_t partial_block_len = X->msg.len % BLOCK_LEN_BYTES;
     for (size_t i = 0; i < n_complete_blocks; ++i) {
         uint8_t Ei[AES256_BLOCK_SIZE_BYTES];
 
@@ -158,27 +161,19 @@ GCM_AE(Aes256Gcm *const P, Aes256Gcm *const out) {
         GHASH_block(Y, padded_block, H);
     }
 
-    uint8_t len_block[16] = {0};
-    const uint64_t aad_bitlen = BSWAP_64(P->aad.len * 8);
-    const uint64_t msg_bitlen = BSWAP_64(P->msg.len * 8);
-    ft_memcpy(len_block, &aad_bitlen, 8);
-    ft_memcpy(len_block + 8, &msg_bitlen, 8);
+    uint64_t len_block[2] = {BSWAP_64(P->aad.len * 8), BSWAP_64(P->msg.len * 8)};
+    GHASH_block(Y, (uint8_t *)len_block, H);
 
-    GHASH_block(Y, len_block, H);
+    uint8_t T[16];
+    Cipher(J0, T, P->expanded_key);
 
-    uint8_t T_data_buf[16];
-    ft_memcpy(T_data_buf, Y, 16);
-
-    Aes256Data T_data = {0};
-    T_data.msg.data = T_data_buf;
-    T_data.msg.len = 16;
-    ft_memcpy(T_data.key, P->key, 32);
-    ft_memcpy(T_data.expanded_key, P->expanded_key, 60 * sizeof(uint32_t));
-
-    GCTR(J0, &T_data, &T_data);
-
-    ft_memcpy(out->tag, T_data.msg.data, 16);
+    for (int i = 0; i < 16; ++i) {
+        out->tag[i] = Y[i] ^ T[i];
+    }
 }
+
+int
+GCM_AD(Aes256Gcm *const C, Aes256Gcm *const out) {}
 
 bool
 GCMAE_empty_message() {
