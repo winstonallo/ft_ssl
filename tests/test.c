@@ -12,5 +12,8 @@ main() {
     assert(GCTR_test_multiblock_no_remainder());
     assert(GCTR_test_multiblock_non_multiple_of_128());
 
-    assert(GCMAE_basic());
+    assert(GCMAE_empty_message());
+    assert(GCMAE_one_block());
+    assert(GCMAE_multiblock());
+    assert(GCMAE_multiblock_remainder());
 }
