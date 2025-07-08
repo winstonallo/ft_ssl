@@ -7,6 +7,8 @@
 #define AES256_BLOCK_SIZE_BYTES 16
 #define AES256_KEY_SIZE_BYTES 32
 #define AES256_EXPANDED_KEY_SIZE_U32 (4 * (14 + 1))
+#define IV_LEN_BYTES 12
+#define TAG_LEN_BYTES 16
 
 typedef struct {
     uint8_t key[AES256_KEY_SIZE_BYTES];

@@ -9,10 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define IV_LEN_BYTES 12
-#define BLOCK_LEN_BYTES 16
-#define TAG_LEN_BYTES 16
-
 __attribute__((always_inline)) static inline void
 GcmMul(const uint8_t X[16], const uint8_t Y[16], uint8_t out[16]) {
     uint8_t Z[16] = {0};
@@ -87,8 +83,8 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
     uint8_t CB[16];
     ft_memcpy(CB, ICB, 16);
 
-    const size_t n_complete_blocks = X->msg.len / BLOCK_LEN_BYTES;
-    const size_t partial_block_len = X->msg.len % BLOCK_LEN_BYTES;
+    const size_t n_complete_blocks = X->msg.len / AES256_BLOCK_SIZE_BYTES;
+    const size_t partial_block_len = X->msg.len % AES256_BLOCK_SIZE_BYTES;
     for (size_t i = 0; i < n_complete_blocks; ++i) {
         uint8_t Ei[AES256_BLOCK_SIZE_BYTES];
 
@@ -181,15 +177,15 @@ GCM_AE(Aes256Gcm *const P, Aes256Gcm *const C) {
 
 int
 GCM_AD(Aes256Gcm *const C, Aes256Gcm *const P) {
-    uint8_t H[BLOCK_LEN_BYTES] = {0};
+    uint8_t H[AES256_BLOCK_SIZE_BYTES] = {0};
     Cipher(H, H, C->expanded_key);
 
-    uint8_t J0[BLOCK_LEN_BYTES] = {0};
+    uint8_t J0[AES256_BLOCK_SIZE_BYTES] = {0};
     ft_memcpy(J0, C->iv, IV_LEN_BYTES);
     J0[15] |= 1;
 
-    uint8_t J1[BLOCK_LEN_BYTES] = {0};
-    ft_memcpy(J1, J0, BLOCK_LEN_BYTES);
+    uint8_t J1[AES256_BLOCK_SIZE_BYTES] = {0};
+    ft_memcpy(J1, J0, AES256_BLOCK_SIZE_BYTES);
     uint32_t *counter_part = (uint32_t *)((uint8_t *)&J1[IV_LEN_BYTES]);
     *counter_part = BSWAP_32(BSWAP_32(*counter_part) + 1);
 
