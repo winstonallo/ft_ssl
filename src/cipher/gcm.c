@@ -79,6 +79,9 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
     if (X->msg.len == 0) {
         *Y = (Aes256Data){0};
         ft_memcpy(Y->key, X->key, sizeof(X->key));
+        ft_memcpy(Y->expanded_key, X->expanded_key, 60 * sizeof(uint32_t));
+        Y->msg.len = 0;
+        Y->msg.data = NULL;
         return;
     }
 
