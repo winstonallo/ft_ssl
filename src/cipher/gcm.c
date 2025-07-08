@@ -137,37 +137,40 @@ GCM_AE(Aes256Gcm *const P, Aes256Gcm *const out) {
 
     GCTR(J1, (Aes256Data *)P, (Aes256Data *)P);
 
-    const uint64_t msg_bits = P->msg.len * 8;
-    const uint64_t aad_bits = P->aad.len * 8;
-    const uint64_t u_bits = (128 - (msg_bits % 128)) % 128;
-    const uint64_t v_bits = (128 - (aad_bits % 128)) % 128;
-    const uint64_t u_bytes = u_bits / 8;
-    const uint64_t v_bytes = v_bits / 8;
+    uint8_t Y[16] = {0};
 
-    const size_t S_buf_len = P->aad.len + v_bytes + P->msg.len + u_bytes + 16;
-    uint8_t *const S_buf = ft_calloc(S_buf_len, 1);
-    if (S_buf == NULL) {
-        fprintf(stderr, "Error allocating S: %s\n", strerror(errno));
-        return;
+    const size_t aad_blocks = P->aad.len / 16;
+    for (size_t i = 0; i < aad_blocks; ++i) {
+        GHASH_block(Y, &P->aad.data[i * 16], H);
+    }
+    const size_t aad_remainder = P->aad.len % 16;
+    if (aad_remainder > 0) {
+        uint8_t padded_block[16] = {0};
+        ft_memcpy(padded_block, P->aad.data + aad_blocks * 16, aad_remainder);
+        GHASH_block(Y, padded_block, H);
     }
 
+    const size_t msg_blocks = P->msg.len / 16;
+    for (size_t i = 0; i < msg_blocks; ++i) {
+        GHASH_block(Y, &P->msg.data[i * 16], H);
+    }
+    const size_t msg_remainder = P->msg.len % 16;
+    if (msg_remainder > 0) {
+        uint8_t padded_block[16] = {0};
+        ft_memcpy(padded_block, P->msg.data + msg_blocks * 16, msg_remainder);
+        GHASH_block(Y, padded_block, H);
+    }
+
+    uint8_t len_block[16] = {0};
     const uint64_t aad_bitlen = BSWAP_64(P->aad.len * 8);
     const uint64_t msg_bitlen = BSWAP_64(P->msg.len * 8);
+    ft_memcpy(len_block, &aad_bitlen, 8);
+    ft_memcpy(len_block + 8, &msg_bitlen, 8);
 
-    size_t offset = 0;
-
-    ft_memcpy(S_buf + offset, P->aad.data, P->aad.len);
-    offset += P->aad.len + v_bytes;
-    ft_memcpy(S_buf + offset, P->msg.data, P->msg.len);
-    offset += P->msg.len + u_bytes;
-    ft_memcpy(S_buf + offset, &aad_bitlen, 8);
-    ft_memcpy(S_buf + offset + 8, &msg_bitlen, 8);
-
-    uint8_t S[16] = {0};
-    GHASH(H, S_buf, S_buf_len, S);
+    GHASH_block(Y, len_block, H);
 
     uint8_t T_data_buf[16];
-    ft_memcpy(T_data_buf, S, 16);
+    ft_memcpy(T_data_buf, Y, 16);
 
     Aes256Data T_data = {0};
     T_data.msg.data = T_data_buf;
