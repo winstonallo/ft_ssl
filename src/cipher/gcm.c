@@ -64,6 +64,14 @@ GHASH(const uint8_t H[16], const uint8_t *const data, size_t len, uint8_t out[16
     ft_memcpy(out, Y, 16);
 }
 
+__attribute__((always_inline)) static inline void
+GHASH_block(uint8_t Y[16], const uint8_t block[16], const uint8_t H[16]) {
+    for (int i = 0; i < 16; ++i) {
+        Y[i] ^= block[i];
+    }
+    GcmMul(Y, H, Y);
+}
+
 // `Y->msg.data` is expected to have at least `X->msg.len` bytes allocated.
 // `X->msg.data` and `Y->msg.data` may overlap.
 __attribute__((always_inline)) static inline void
