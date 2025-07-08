@@ -34,8 +34,8 @@ typedef struct {
     uint8_t iv[12];
 } Aes256Gcm;
 
-Aes256Data *Aes256_ECB_Encrypt(Aes256Data *);
-Aes256Data *Aes256_ECB_Decrypt(Aes256Data *);
+int GCM_AD(Aes256Gcm *const C, Aes256Gcm *const P);
+void GCM_AE(Aes256Gcm *const P, Aes256Gcm *const C);
 
 void AES256_Init(Aes256Data *data, const uint8_t key[AES256_KEY_SIZE_BYTES], const uint8_t *const msg, const size_t msg_len);
 uint8_t *InvCipher(uint8_t *in, uint8_t *const out, uint32_t *w);
