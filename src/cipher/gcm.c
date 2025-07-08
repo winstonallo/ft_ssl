@@ -170,26 +170,14 @@ GCM_AE(Aes256Gcm *const P, Aes256Gcm *const C) {
     for (int i = 0; i < AES256_BLOCK_SIZE_BYTES; ++i) {
         C->tag[i] = Y[i] ^ T[i];
     }
-}
 
-int
-GCM_AD(Aes256Gcm *const C, Aes256Gcm *const out) {}
-
-bool
-GCMAE_empty_message() {
-    uint8_t key[32] = {0};
-    uint8_t plaintext[16] = {0};
-
-    Aes256Gcm X = {0};
-    AES256_Init((Aes256Data *)&X, key, plaintext, 0); // 0 length
-    uint8_t iv[12] = {0};
-    ft_memcpy(X.iv, iv, 12);
-    GCM_AE(&X, &X);
-
-    const uint8_t expected_tag[16] = {0x53, 0x0f, 0x8a, 0xfb, 0xc7, 0x45, 0x36, 0xb9, 0xa9, 0x63, 0xb4, 0xf1, 0xc4, 0xcb, 0x73, 0x8b};
-    for (int i = 0; i < 16; ++i) {
-        if (X.tag[i] != expected_tag[i]) {
-            return false;
+    // tag and ciphertext are already written to C
+    ft_memcpy(C->aad.data, P->aad.data, P->aad.len);
+    ft_memcpy(C->iv, P->iv, IV_LEN_BYTES);
+    ft_memcpy(C->expanded_key, P->expanded_key, AES256_EXPANDED_KEY_SIZE_U32);
+    ft_memcpy(C->key, P->key, AES256_KEY_SIZE_BYTES);
+    C->aad.len = P->aad.len;
+    C->msg.len = P->msg.len;
         }
     }
     return true;
