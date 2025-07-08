@@ -119,7 +119,6 @@ GCTR(const uint8_t *const restrict ICB, const Aes256Data *const X, Aes256Data *c
 
 void
 GCM_AE(Aes256Gcm *const P, Aes256Gcm *const out) {
-    (void)out;
     uint8_t H[16] = {0};
     Cipher(H, H, P->expanded_key);
 
