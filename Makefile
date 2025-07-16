@@ -52,6 +52,11 @@ CFLAGS = -O3 -DFS_BLOCK_SIZE=${BLOCK_SIZE} -Wall -Wextra -Werror \
 	-I$(LIBFT_DIR)/src/bit
 LDFLAGS = $(LIBFT_FLAGS)
 
+all: $(LIBFT) $(NAME)
+
+$(NAME): $(OBJS) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
+
 test: $(LIBFT) $(TEST_OBJS)
 	$(CC) $(CFLAGS) -g $(TEST_OBJS) tests/test.c -o ft_ssl_test $(LDFLAGS)
 
@@ -64,10 +69,6 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)/cipher
 	mkdir -p $(OBJ_DIR)/display
 
-all: $(LIBFT) $(NAME)
-
-$(NAME): $(OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
 
 clean:
 	rm -rf $(OBJ_DIR)
